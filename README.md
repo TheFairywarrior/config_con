@@ -4,7 +4,7 @@ The concept of the Configurable Connector is to be as modular as possible. Each 
 ## Architecture
 
 ### Queue Objects
-`QueueObjects` is going to be an interface for different queue types that are going to be between each step of the connector pipe.
+`QueueObjects` are going to be an interface for different queue types that are going to be between each step of the connector pipe.
 
 The `QueueObjects` can be seen as a simple `chan` for the most part, for the local runner it would simply be wrapping one. This would mean that multiple "workers" could be used to retrieve data and pass that data into the same "queue".
 
@@ -23,3 +23,37 @@ Once the transformation is done the finished data is then sent to the "PublishQu
 ### Publisher
 Publisher is an interface that is going to have `Publish(Context, Message)` that is going to be the last part of the pipeline that is going to publish the data to the point that needs it.
 
+### Pipeline
+The `Pipeline` struct is what is going to be holding all of the different parts. This is also where the management is going to be taking place, specifically it's going to be starting the worker/s for the `Consumer`, `Transformer` and `Publisher`.
+
+## Configuration
+
+The configuration is built in a way that is as simple as possible, all of the different parts are going to be setup and identified with a unique name. Then the pipeline configuration will be built up using the identifiers as well as the actual pipeline config.
+
+```yaml
+consumers:
+    - <consumer identifier>:
+        type: <consumer_type>
+        configuration: <consumer specific config>
+transformers:
+    - <transformer identifier>:
+        steps: 
+            - <step 1 name>
+            - <step 2 name>
+publishers:
+    - <publisher identifier>:
+        type: <publisher type>
+        configuration: <publisher specific config>
+pipelines:
+    - <pipeline identifier>:
+        consumer: 
+            id: <consumer identifier>
+            worker_count: 0
+        transformer:
+            id: <transformer identifier>
+            worker_count: 0
+        publisher:
+            id: <transformer identifier>
+            worker_count: 0
+            extra: <extras required for publishing (Possibly topic)>
+```
