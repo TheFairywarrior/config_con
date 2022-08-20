@@ -1,0 +1,6 @@
+consumers:
+- consumer1:
+    type: api
+    configuration: 
+      eventSecret: secret
+      eventWebHookRoute: webook

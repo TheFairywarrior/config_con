@@ -1,0 +1,6 @@
+consumers:
+  - twitch_event:
+      type: api.twitch.event
+      configuration: 
+        event_secret: secret
+        event_webhook_route: /twitch/event
