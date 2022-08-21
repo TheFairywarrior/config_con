@@ -4,13 +4,13 @@ import (
 	"config_con/pkg/pipe/consumer"
 	"config_con/pkg/pipe/consumer/api"
 	"config_con/pkg/pipe/consumer/twitch"
-	"os"
+	"config_con/pkg/utils/environment"
 	"reflect"
 	"testing"
 )
 
 func TestReadConfiguration(t *testing.T) {
-	os.Setenv("CONFIG_FILE_PATH", "test_data/test_config.yaml")
+	environment.Settings.ConfigFilePath = "test_data/test_config.yaml"
 	tests := []struct {
 		name    string
 		want    YamlConfiguration
@@ -21,12 +21,12 @@ func TestReadConfiguration(t *testing.T) {
 			want: YamlConfiguration{
 				Consumers: []consumer.ConsumerConfig{
 					{
-						Name: "test_consumer",
 						Api: api.ApiConfiguration{
 							TwitchConsumers: []twitch.TwitchEventConfig{
 								{
+									Name:        "test_consumer",
 									EventSecret: "test_consumer_secret",
-									Url: "test_consumer_url",
+									Url:         "test_consumer_url",
 								},
 							},
 						},

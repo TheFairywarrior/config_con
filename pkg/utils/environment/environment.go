@@ -6,19 +6,18 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
-type Settings struct {
+type Environment struct {
 	ConfigFilePath string `env:"CONFIG_CONNECTORCONFIG_FILE_PATH"`
 }
 
-var settings Settings
+var Settings Environment
 
-func GetSettings() Settings {
-	if settings == (Settings{}) {
-		if err := env.Parse(&settings); err != nil {
+func init() {
+	if Settings == (Environment{}) {
+		if err := env.Parse(&Settings); err != nil {
 			log.Fatal(err)
 		}
 	}
-	return settings
 }
 
 

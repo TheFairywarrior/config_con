@@ -17,7 +17,7 @@ type YamlConfiguration struct {
 }
 
 func ReadConfiguration() (YamlConfiguration, error) {
-	configFilePath := environment.GetSettings().ConfigFilePath
+	configFilePath := environment.Settings.ConfigFilePath
 	if configFilePath == "" {
 		configFilePath = "config.yaml"
 	}

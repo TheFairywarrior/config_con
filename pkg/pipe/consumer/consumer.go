@@ -12,6 +12,5 @@ type Consumer interface {
 }
 
 type ConsumerConfig struct {
-	Name string               `yaml:"name"`
 	Api  api.ApiConfiguration `yaml:"api"`
 }

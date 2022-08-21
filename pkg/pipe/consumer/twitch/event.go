@@ -6,18 +6,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type  TwitchEventConfig struct {
+type TwitchEventConfig struct {
+	Name        string `yaml:"name"`
 	EventSecret string `yaml:"eventSecret"`
-	Url       string `yaml: "url"`
+	Url         string `yaml: "url"`
 }
-
 
 type TwitchEventConsumer struct {
 	TwitchEventConfig
 	queue queue.TransformerQueue
 }
-
-
 
 func (con TwitchEventConfig) Route(cxt *fiber.Ctx) error {
 	return cxt.SendString("Hello World")
