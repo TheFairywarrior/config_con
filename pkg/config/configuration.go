@@ -2,9 +2,8 @@ package config
 
 import (
 	"config_con/pkg/pipe/consumer"
-	"config_con/pkg/utils/shortcuts"
+	"config_con/pkg/utils/environment"
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -13,24 +12,23 @@ type Configuration struct {
 	consumers map[string]consumer.Consumer
 }
 
-
 type YamlConfiguration struct {
-	consumers []consumer.ConsumerConfig
+	Consumers []consumer.ConsumerConfig `yaml:"consumers"`
 }
 
-func ReadConfiguration() (shortcuts.Map, error) {
-	configFilePath := os.Getenv("CONFIG_FILE_PATH")
+func ReadConfiguration() (YamlConfiguration, error) {
+	configFilePath := environment.GetSettings().ConfigFilePath
 	if configFilePath == "" {
 		configFilePath = "config.yaml"
 	}
-	var configMap shortcuts.Map
+	var configMap YamlConfiguration
 	yamlFile, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		return nil, err
+		return YamlConfiguration{}, err
 	}
 	err = yaml.Unmarshal(yamlFile, &configMap)
 	if err != nil {
-		return nil, err
+		return YamlConfiguration{}, err
 	}
 	return configMap, nil
 }

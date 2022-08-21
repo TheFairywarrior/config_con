@@ -1,8 +1,9 @@
 package config
 
 import (
-	"config_con/pkg/utils/shortcuts"
-	"fmt"
+	"config_con/pkg/pipe/consumer"
+	"config_con/pkg/pipe/consumer/api"
+	"config_con/pkg/pipe/consumer/twitch"
 	"os"
 	"reflect"
 	"testing"
@@ -10,23 +11,24 @@ import (
 
 func TestReadConfiguration(t *testing.T) {
 	os.Setenv("CONFIG_FILE_PATH", "test_data/test_config.yaml")
-	asdf, _ := os.Getwd()
-	fmt.Println(asdf)
 	tests := []struct {
 		name    string
-		want    shortcuts.Map
+		want    YamlConfiguration
 		wantErr bool
 	}{
 		{
-			name: "TestReadConfiguration",
-			want: shortcuts.Map{
-				"consumers": []shortcuts.Map{
+			name: "ReadConfiguration",
+			want: YamlConfiguration{
+				Consumers: []consumer.ConsumerConfig{
 					{
-						"name": "consumer1",
-						"type": "api",
-						"configuration": shortcuts.Map{
-							"eventSecret":        "secret",
-							"eventWebHookRoute": "webhook",
+						Name: "test_consumer",
+						Api: api.ApiConfiguration{
+							TwitchConsumers: []twitch.TwitchEventConfig{
+								{
+									EventSecret: "test_consumer_secret",
+									Url: "test_consumer_url",
+								},
+							},
 						},
 					},
 				},

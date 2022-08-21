@@ -4,5 +4,5 @@ import "config_con/pkg/pipe/consumer/twitch"
 
 
 type ApiConfiguration struct {
-	twitchConsumers []twitch.TwitchEventConfig
+	TwitchConsumers []twitch.TwitchEventConfig `yaml:"twitchConsumers"`
 }

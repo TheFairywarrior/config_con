@@ -1,6 +1,6 @@
 consumers:
-- consumer1:
-    type: api
-    configuration: 
-      eventSecret: secret
-      eventWebHookRoute: webook
+  - name: test_consumer
+    api: 
+      twitchConsumers: 
+        - eventSecret: test_consumer_secret
+          url: test_consumer_url

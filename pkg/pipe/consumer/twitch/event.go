@@ -6,14 +6,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type TwitchEventConfig struct {
-	eventSecret string
-	route       string
+type  TwitchEventConfig struct {
+	EventSecret string `yaml:"eventSecret"`
+	Url       string `yaml: "url"`
 }
 
 
 type TwitchEventConsumer struct {
-	configuration TwitchEventConfig
+	TwitchEventConfig
 	queue queue.TransformerQueue
 }
 
