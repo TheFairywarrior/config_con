@@ -32,9 +32,8 @@ The configuration is built in a way that is as simple as possible, all of the di
 
 ```yaml
 consumers:
-    - <consumer identifier>:
-        type: <consumer_type>
-        configuration: <consumer specific config>
+    - <consumer type>:
+        <cosnumer type configuration>
 transformers:
     - <transformer identifier>:
         steps: 

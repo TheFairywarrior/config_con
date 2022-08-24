@@ -1,6 +1,7 @@
 package config
 
 import (
+	"config_con/pkg/pipe"
 	"config_con/pkg/pipe/consumer"
 	"config_con/pkg/utils/environment"
 	"io/ioutil"
@@ -8,13 +9,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Configuration struct {
-	consumers map[string]consumer.Consumer
-}
-
-type YamlConfiguration struct {
-	Consumers []consumer.ConsumerConfig `yaml:"consumers"`
-}
 
 func ReadConfiguration() (YamlConfiguration, error) {
 	configFilePath := environment.Settings.ConfigFilePath
@@ -33,6 +27,8 @@ func ReadConfiguration() (YamlConfiguration, error) {
 	return configMap, nil
 }
 
-func ReadConsumerConfigurations() map[string]consumer.Consumer {
-	return map[string]consumer.Consumer{}
+
+type YamlConfiguration struct {
+	Consumers []consumer.ConsumerConfig `yaml:"consumers"`
+	Pipelines []pipe.PipeConfig         `yaml:"pipelines"`
 }

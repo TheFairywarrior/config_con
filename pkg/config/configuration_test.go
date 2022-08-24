@@ -2,7 +2,6 @@ package config
 
 import (
 	"config_con/pkg/pipe/consumer"
-	"config_con/pkg/pipe/consumer/api"
 	"config_con/pkg/pipe/consumer/twitch"
 	"config_con/pkg/utils/environment"
 	"reflect"
@@ -21,13 +20,11 @@ func TestReadConfiguration(t *testing.T) {
 			want: YamlConfiguration{
 				Consumers: []consumer.ConsumerConfig{
 					{
-						Api: api.ApiConfiguration{
-							TwitchConsumers: []twitch.TwitchEventConfig{
-								{
-									Name:        "test_consumer",
-									EventSecret: "test_consumer_secret",
-									Url:         "test_consumer_url",
-								},
+						TwitchEventConfigs: []twitch.TwitchEventConsumer{
+							{
+								Name:        "test_consumer",
+								EventSecret: "test_consumer_secret",
+								Url:         "test_consumer_url",
 							},
 						},
 					},

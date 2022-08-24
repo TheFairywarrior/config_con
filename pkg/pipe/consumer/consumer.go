@@ -1,16 +1,24 @@
 package consumer
 
 import (
-	"config_con/pkg/pipe/consumer/api"
+	"config_con/pkg/pipe/consumer/twitch"
 	"config_con/pkg/pipe/queue"
 	"context"
 )
 
 // Consumer interface is used in the pipeline to consume the data from multiple sources.
 type Consumer interface {
-	Consume(context.Context, chan queue.TransformerQueue)
+	Consume(context.Context, queue.TransformerQueue) error
 }
 
 type ConsumerConfig struct {
-	Api  api.ApiConfiguration `yaml:"api"`
+	TwitchEventConfigs []twitch.TwitchEventConsumer `yaml:"twitchConfig"`
+}
+
+func (con ConsumerConfig) GetConsumerMap() map[string]Consumer {
+	consumerMap := make(map[string]Consumer)
+	for _, twitchEventConfig := range con.TwitchEventConfigs {
+		consumerMap[twitchEventConfig.Name] = twitchEventConfig
+	}
+	return consumerMap
 }

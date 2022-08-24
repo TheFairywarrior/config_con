@@ -1,6 +1,5 @@
 consumers:
-  - api: 
-      twitchConsumers: 
-        - eventSecret: test_consumer_secret
-          url: test_consumer_url
-          name: test_consumer
+  - twitchConsumers: 
+    - eventSecret: test_consumer_secret
+      url: test_consumer_url
+      name: test_consumer
