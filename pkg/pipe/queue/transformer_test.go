@@ -8,7 +8,7 @@ import (
 
 func TestTransformerQueue_Crud(t *testing.T) {
 	queue := TransformerQueue{
-		queue: make(chan shortcuts.Map, 1),
+		queue: make(chan any, 1),
 	}
 	queue.Add(shortcuts.Map{})
 	<- queue.Chan()

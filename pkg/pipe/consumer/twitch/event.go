@@ -2,6 +2,7 @@ package twitch
 
 import (
 	"config_con/pkg/pipe/queue"
+	"config_con/pkg/utils/override"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -17,30 +18,38 @@ type TwitchEventConsumer struct {
 	Url         string `yaml:"url"`
 }
 
+type condition struct {
+	BroadCasterUserId string `json:"broadcaster_user_id"`
+}
+
+type transport struct {
+	Method   string `json:"method"`
+	Callback string `json:"callback"`
+}
+
+type subscription struct {
+	Id        string    `json:"id"`
+	Status    string    `json:"status"`
+	EventType string    `json:"type"`
+	Version   string    `json:"version"`
+	Cost      int       `json:"cost"`
+	Condition condition `json:"condition"`
+	Transport transport `json:"transport"`
+	CreatedAt string    `json:"created_at"`
+}
+
+type event struct {
+	UserId               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadCasterUserId    string `json:"broadcaster_user_id"`
+	BroadCasterUserLogin string `json:"broadcaster_user_login"`
+	BroadCasterUserName  string `json:"broadcaster_user_name"`
+}
+
 type twitchEventPayload struct {
-	subscription struct {
-		id        string
-		status    string
-		eventType string `json:"type"`
-		version   string
-		cost      int
-		condition struct {
-			broadCasterUserId string `json: "broadcaster_user_id"`
-		}
-		transport struct {
-			method   string
-			callback string
-		}
-		createdAt string `json:"created_at"`
-	}
-	event struct {
-		userId               string `json:"user_id"`
-		userLogin            string `json:"user_login"`
-		userName             string `json:"user_name"`
-		broadCasterUserId    string `json:"broadcaster_user_id"`
-		broadCasterUserLogin string `json:"broadcaster_user_login"`
-		broadCasterUserName  string `json:"broadcaster_user_name"`
-	}
+	Subscription subscription `json:"Subscription"`
+	Event        event        `json:"event"`
 }
 
 // verifyEvent takes the event signature and body and verifies it against the secret.
@@ -52,7 +61,7 @@ func (con TwitchEventConsumer) verifyEvent(message, messageSignature string) boo
 	return hmac.Equal([]byte(messageSignature), sigCheck)
 }
 
-func (con TwitchEventConsumer) EventRoute(ctx *fiber.Ctx) error {
+func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
 	signature := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
 	timestamp := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
 	messageId := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
@@ -69,7 +78,7 @@ func (con TwitchEventConsumer) EventRoute(ctx *fiber.Ctx) error {
 		)
 	}
 	payloadJson, _ := json.Marshal(&payload)
-	if !con.verifyEvent(messageId + timestamp + string(payloadJson), signature) {
+	if !con.verifyEvent(messageId+timestamp+string(payloadJson), signature) {
 		return ctx.Status(400).JSON(
 			fiber.Map{
 				"error":   "Invalid signature",
@@ -77,6 +86,7 @@ func (con TwitchEventConsumer) EventRoute(ctx *fiber.Ctx) error {
 			},
 		)
 	}
+	q.Add(payload)
 
 	return nil
 }
