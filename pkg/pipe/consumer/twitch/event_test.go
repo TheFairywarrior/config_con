@@ -1,11 +1,18 @@
 package twitch
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"testing"
 )
 
 func TestTwitchEventConsumer_EventRoute(t *testing.T) {
+	eventSecret := "hello"
+	timestamp := "2022-10-10T10:10:10Z"
+	messageId := "12345"
 	payload := twitchEventPayload{
 		Subscription: subscription{
 			Id:        "id",
@@ -32,4 +39,11 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 		},
 	}
 	jsonData, _ := json.Marshal(payload)
+	mac := hmac.New(sha256.New, []byte(eventSecret))
+	secretBody := messageId + timestamp + string(jsonData)
+	mac.Write([]byte(secretBody))
+	h := mac.Sum(nil)
+	signature := "sha256=" + hex.EncodeToString(h)
+	fmt.Println(signature)
+
 }
