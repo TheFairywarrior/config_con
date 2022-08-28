@@ -1,12 +1,15 @@
 package twitch
 
 import (
+	"config_con/pkg/pipe/queue"
+	"config_con/pkg/utils/test"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTwitchEventConsumer_EventRoute(t *testing.T) {
@@ -44,6 +47,22 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	mac.Write([]byte(secretBody))
 	h := mac.Sum(nil)
 	signature := "sha256=" + hex.EncodeToString(h)
-	fmt.Println(signature)
+	fakeContext := test.FakeFiberContext{
+		Body: []byte(jsonData),
+		Headers: map[string]string{
+			"X-Hub-Signature":                     signature,
+			"twitch-eventsub-message-signature": signature,
+			"twitch-eventsub-message-id":        messageId,
+			"twitch-eventsub-message-timestamp": timestamp,
+		},
+	}
 
+	consumer := TwitchEventConsumer{
+		Name:        "test",
+		EventSecret: eventSecret,
+		Url:         "url",
+	}
+	err := consumer.EventRoute(&fakeContext, queue.TransformerQueue{})
+	assert.NoError(t, err)
+	assert.Equal(t, fakeContext.CurrentStatus, 200)
 }

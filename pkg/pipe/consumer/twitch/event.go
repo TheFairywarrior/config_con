@@ -77,7 +77,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 			body,
 		)
 	}
-	payloadJson, _ := json.Marshal(&payload)
+	payloadJson, _ := json.Marshal(payload)
 	if !con.verifyEvent(messageId+timestamp+string(payloadJson), signature) {
 		return ctx.Status(400).JSON(
 			fiber.Map{
