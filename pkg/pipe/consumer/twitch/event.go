@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 
@@ -48,7 +49,7 @@ type event struct {
 }
 
 type twitchEventPayload struct {
-	Subscription subscription `json:"Subscription"`
+	Subscription subscription `json:"subscription"`
 	Event        event        `json:"event"`
 }
 
@@ -57,14 +58,29 @@ func (con TwitchEventConsumer) verifyEvent(message, messageSignature string) boo
 	prefix := "sha256="
 	mac := hmac.New(sha256.New, []byte(con.EventSecret))
 	mac.Write([]byte(prefix + message))
-	sigCheck := mac.Sum(nil)
-	return hmac.Equal([]byte(messageSignature), sigCheck)
+	sigCheck := prefix + hex.EncodeToString(mac.Sum(nil))
+	return messageSignature == sigCheck
 }
 
 func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
-	signature := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
-	timestamp := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
-	messageId := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
+	signature, ok := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
+	timestamp, ok := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
+	messageId, ok := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
+	messageType, ok := ctx.GetReqHeaders()["twitch-eventsub-message-type"]
+
+	if !ok {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": "missing-headers",
+			"message": "The headers are missing from the request.",
+			"required": []string{
+				"twitch-eventsub-message-signature",
+				"twitch-eventsub-message-timestamp",
+				"twitch-eventsub-message-id",
+				"twitch-eventsub-message-type",
+			},
+		})
+	}
+
 	var payload twitchEventPayload
 	err := ctx.BodyParser(&payload)
 	if err != nil {
@@ -88,7 +104,9 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 	}
 	q.Add(payload)
 
-	return nil
+	return ctx.Status(200).JSON(fiber.Map{
+		"message": "Success",
+	})
 }
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.TransformerQueue) error {

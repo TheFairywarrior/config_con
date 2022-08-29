@@ -44,16 +44,17 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	jsonData, _ := json.Marshal(payload)
 	mac := hmac.New(sha256.New, []byte(eventSecret))
 	secretBody := messageId + timestamp + string(jsonData)
-	mac.Write([]byte(secretBody))
+	mac.Write([]byte("sha256=" + secretBody))
 	h := mac.Sum(nil)
 	signature := "sha256=" + hex.EncodeToString(h)
 	fakeContext := test.FakeFiberContext{
 		Body: []byte(jsonData),
 		Headers: map[string]string{
-			"X-Hub-Signature":                     signature,
+			"X-Hub-Signature":                   signature,
 			"twitch-eventsub-message-signature": signature,
 			"twitch-eventsub-message-id":        messageId,
 			"twitch-eventsub-message-timestamp": timestamp,
+			"twitch-eventsub-message-type":      "type",
 		},
 	}
 
@@ -62,7 +63,11 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 		EventSecret: eventSecret,
 		Url:         "url",
 	}
-	err := consumer.EventRoute(&fakeContext, queue.TransformerQueue{})
+
+	tQueue := queue.NewTransformerQueue(1)
+
+	err := consumer.EventRoute(&fakeContext, tQueue)
 	assert.NoError(t, err)
-	assert.Equal(t, fakeContext.CurrentStatus, 200)
+	assert.Equal(t, 200, fakeContext.CurrentStatus)
+	<-tQueue.Chan()
 }

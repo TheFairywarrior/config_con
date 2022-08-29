@@ -23,3 +23,10 @@ func (q TransformerQueue) Chan() <-chan any {
 func (q TransformerQueue) Close() {
 	close(q.queue)
 }
+
+
+func NewTransformerQueue(size int) TransformerQueue {
+	return TransformerQueue{
+		queue: make(chan any, size),
+	}
+}
