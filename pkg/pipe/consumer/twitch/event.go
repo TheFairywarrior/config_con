@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,27 +63,31 @@ func (con TwitchEventConsumer) verifyEvent(message, messageSignature string) boo
 	return messageSignature == sigCheck
 }
 
-func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
-	signature, ok := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
-	timestamp, ok := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
-	messageId, ok := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
-	messageType, ok := ctx.GetReqHeaders()["twitch-eventsub-message-type"]
+func getHeaders(ctx override.FiberContext) (string, string, string, string, error) {
+	signature, sOk := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
+	timestamp, tOk := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
+	messageId, mOk := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
+	messageType, mTOk := ctx.GetReqHeaders()["twitch-eventsub-message-type"]
 
-	if !ok {
+	if !sOk || !tOk || !mOk || !mTOk {
+		return "", "", "", "", fmt.Errorf("missing headers, required headers are twitch-eventsub-message-signature, twitch-eventsub-message-timestamp, twitch-eventsub-message-id, twitch-eventsub-message-type")
+	}
+
+	return signature, timestamp, messageId, messageType, nil
+}
+
+
+// EventRoute is the actual function that going to be run when the consumer api is hit.
+func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
+	signature, timestamp, messageId, messageType, err := getHeaders(ctx)
+	if err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": "missing-headers",
-			"message": "The headers are missing from the request.",
-			"required": []string{
-				"twitch-eventsub-message-signature",
-				"twitch-eventsub-message-timestamp",
-				"twitch-eventsub-message-id",
-				"twitch-eventsub-message-type",
-			},
+			"error": err.Error(),
 		})
 	}
 
 	var payload twitchEventPayload
-	err := ctx.BodyParser(&payload)
+	err = ctx.BodyParser(&payload)
 	if err != nil {
 		body := fiber.Map{
 			"error":   "Invalid body",
@@ -99,6 +104,14 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 			fiber.Map{
 				"error":   "Invalid signature",
 				"message": "Signature does not match",
+			},
+		)
+	}
+
+	if messageType == "webhook_callback_verification" {
+		return ctx.Status(200).JSON(
+			fiber.Map{
+				"message": "Verified",
 			},
 		)
 	}
