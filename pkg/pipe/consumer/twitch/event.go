@@ -86,6 +86,14 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 		})
 	}
 
+	if messageType == "webhook_callback_verification" {
+		return ctx.Status(200).JSON(
+			fiber.Map{
+				"message": "Verified",
+			},
+		)
+	}
+
 	var payload twitchEventPayload
 	err = ctx.BodyParser(&payload)
 	if err != nil {
@@ -100,7 +108,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 	}
 	payloadJson, _ := json.Marshal(payload)
 	if !con.verifyEvent(messageId+timestamp+string(payloadJson), signature) {
-		return ctx.Status(400).JSON(
+		return ctx.Status(402).JSON(
 			fiber.Map{
 				"error":   "Invalid signature",
 				"message": "Signature does not match",
@@ -108,13 +116,6 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 		)
 	}
 
-	if messageType == "webhook_callback_verification" {
-		return ctx.Status(200).JSON(
-			fiber.Map{
-				"message": "Verified",
-			},
-		)
-	}
 	q.Add(payload)
 
 	return ctx.Status(200).JSON(fiber.Map{

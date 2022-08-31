@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,4 +71,35 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, fakeContext.CurrentStatus)
 	<-tQueue.Chan()
+
+	fakeContext = test.FakeFiberContext{
+		Body: []byte(jsonData),
+		Headers: map[string]string{
+			"X-Hub-Signature":                   signature,
+			"twitch-eventsub-message-signature": signature,
+			"twitch-eventsub-message-id":        messageId,
+			"twitch-eventsub-message-timestamp": timestamp,
+			"twitch-eventsub-message-type":      "webhook_callback_verification",
+		},
+	}
+	err = consumer.EventRoute(&fakeContext, tQueue)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, fakeContext.CurrentStatus)
+
+	brokenData, _ := json.Marshal(fiber.Map{
+		"broken": "data",
+	})
+	fakeContext = test.FakeFiberContext{
+		Body: brokenData,
+		Headers: map[string]string{
+			"X-Hub-Signature":                   signature,
+			"twitch-eventsub-message-signature": "signature",
+			"twitch-eventsub-message-id":        messageId,
+			"twitch-eventsub-message-timestamp": timestamp,
+			"twitch-eventsub-message-type":      "type",
+		},
+	}
+	err = consumer.EventRoute(&fakeContext, tQueue)
+	assert.NoError(t, err)
+	assert.Equal(t, 402, fakeContext.CurrentStatus)
 }
