@@ -1,9 +1,10 @@
 package override
 
+import "github.com/gofiber/fiber/v2"
 
 type FiberContext interface {
-	BodyParser(interface{}) error 
+	BodyParser(interface{}) error
 	GetReqHeaders() map[string]string
-	Status(int) FiberContext
+	Status(status int) *fiber.Ctx
 	JSON(interface{}) error
 }

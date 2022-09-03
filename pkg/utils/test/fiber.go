@@ -1,12 +1,13 @@
 package test
 
 import (
-	"config_con/pkg/utils/override"
 	"encoding/json"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type FakeFiberContext struct {
-	OutBody any
+	OutBody       any
 	CurrentStatus int
 	Body          []byte
 	Headers       map[string]string
@@ -20,9 +21,9 @@ func (f *FakeFiberContext) GetReqHeaders() map[string]string {
 	return f.Headers
 }
 
-func (f *FakeFiberContext) Status(status int) override.FiberContext {
+func (f *FakeFiberContext) Status(status int) *fiber.Ctx {
 	f.CurrentStatus = status
-	return f
+	return nil
 }
 
 func (f *FakeFiberContext) JSON(v interface{}) error {

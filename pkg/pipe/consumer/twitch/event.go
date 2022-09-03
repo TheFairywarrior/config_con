@@ -1,6 +1,7 @@
 package twitch
 
 import (
+	"config_con/pkg/api"
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/utils/override"
 	"context"
@@ -76,18 +77,19 @@ func getHeaders(ctx override.FiberContext) (string, string, string, string, erro
 	return signature, timestamp, messageId, messageType, nil
 }
 
-
 // EventRoute is the actual function that going to be run when the consumer api is hit.
 func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
 	signature, timestamp, messageId, messageType, err := getHeaders(ctx)
 	if err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
+		ctx.Status(400)
+		return ctx.JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
 	if messageType == "webhook_callback_verification" {
-		return ctx.Status(200).JSON(
+		ctx.Status(200)
+		return ctx.JSON(
 			fiber.Map{
 				"message": "Verified",
 			},
@@ -102,13 +104,15 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 			"message": err.Error(),
 		}
 		log.Println(body)
-		return ctx.Status(400).JSON(
+		ctx.Status(400)
+		return ctx.JSON(
 			body,
 		)
 	}
 	payloadJson, _ := json.Marshal(payload)
 	if !con.verifyEvent(messageId+timestamp+string(payloadJson), signature) {
-		return ctx.Status(402).JSON(
+		ctx.Status(402)
+		return ctx.JSON(
 			fiber.Map{
 				"error":   "Invalid signature",
 				"message": "Signature does not match",
@@ -118,11 +122,15 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 
 	q.Add(payload)
 
-	return ctx.Status(200).JSON(fiber.Map{
+	ctx.Status(200)
+	return ctx.JSON(fiber.Map{
 		"message": "Success",
 	})
 }
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.TransformerQueue) error {
-	return nil
+	server := api.GetServer()
+	return server.AddRoute("GET", con.Url, func(ctx *fiber.Ctx) error {
+		return con.EventRoute(ctx, q)
+	})
 }
