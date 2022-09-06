@@ -5,11 +5,7 @@ import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/utils/override"
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -50,31 +46,18 @@ type event struct {
 	BroadCasterUserName  string `json:"broadcaster_user_name"`
 }
 
-type twitchEventPayload struct {
+type TwitchEventData struct {
 	Subscription subscription `json:"subscription"`
 	Event        event        `json:"event"`
 }
 
-// verifyEvent takes the event signature and body and verifies it against the secret.
-func (con TwitchEventConsumer) verifyEvent(message, messageSignature string) bool {
-	prefix := "sha256="
-	mac := hmac.New(sha256.New, []byte(con.EventSecret))
-	mac.Write([]byte(prefix + message))
-	sigCheck := prefix + hex.EncodeToString(mac.Sum(nil))
-	return messageSignature == sigCheck
+type TwitchEventMessage struct {
+	queue.MessageData
+	TwitchEventData
 }
 
-func getHeaders(ctx override.FiberContext) (string, string, string, string, error) {
-	signature, sOk := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
-	timestamp, tOk := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
-	messageId, mOk := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
-	messageType, mTOk := ctx.GetReqHeaders()["twitch-eventsub-message-type"]
-
-	if !sOk || !tOk || !mOk || !mTOk {
-		return "", "", "", "", fmt.Errorf("missing headers, required headers are twitch-eventsub-message-signature, twitch-eventsub-message-timestamp, twitch-eventsub-message-id, twitch-eventsub-message-type")
-	}
-
-	return signature, timestamp, messageId, messageType, nil
+func (message TwitchEventMessage) GetData() any {
+	return message.TwitchEventData
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
@@ -96,7 +79,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 		)
 	}
 
-	var payload twitchEventPayload
+	var payload TwitchEventData
 	err = ctx.BodyParser(&payload)
 	if err != nil {
 		body := fiber.Map{
@@ -120,10 +103,14 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 		)
 	}
 
-	q.Add(payload)
+	message := TwitchEventMessage{
+		MessageData:     queue.NewMessageData(),
+		TwitchEventData: payload,
+	}
+	q.Add(message)
 
 	ctx.Status(200)
-	return ctx.JSON(fiber.Map{
+	return ctx.JSON(fiber.Map {
 		"message": "Success",
 	})
 }

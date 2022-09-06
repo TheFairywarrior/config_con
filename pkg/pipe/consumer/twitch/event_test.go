@@ -17,7 +17,7 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	eventSecret := "hello"
 	timestamp := "2022-10-10T10:10:10Z"
 	messageId := "12345"
-	payload := twitchEventPayload{
+	payload := TwitchEventData{
 		Subscription: subscription{
 			Id:        "id",
 			Status:    "status",

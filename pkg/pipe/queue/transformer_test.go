@@ -2,17 +2,31 @@ package queue
 
 
 import (
-	"config_con/pkg/utils/shortcuts"
 	"testing"
 )
 
+type TestMessage struct {
+	MessageData
+	data string
+}
+
+func (m TestMessage) GetData() any {
+	return m.data
+}
+
+
 func TestTransformerQueue_Crud(t *testing.T) {
 	queue := TransformerQueue{
-		queue: make(chan any, 1),
+		queue: make(chan Message, 1),
 	}
-	queue.Add(shortcuts.Map{})
+
+	message := TestMessage{
+		MessageData: NewMessageData(),
+		data:        "test",
+	}
+	queue.Add(message)
 	<- queue.Chan()
-	queue.Add(shortcuts.Map{})
+	queue.Add(message)
 	<-queue.Chan()
 	queue.Close()
 }
