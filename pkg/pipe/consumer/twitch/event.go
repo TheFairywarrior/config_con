@@ -110,7 +110,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 	q.Add(message)
 
 	ctx.Status(200)
-	return ctx.JSON(fiber.Map {
+	return ctx.JSON(fiber.Map{
 		"message": "Success",
 	})
 }
