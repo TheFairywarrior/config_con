@@ -19,7 +19,7 @@ func MapConstructor(keys []string) map[string]any {
 			key: MapConstructor(keys),
 		}
 	}
-	return nil
+	return nil 
 }
 
 // Build creates the "new" map with the new keys.
@@ -34,17 +34,33 @@ func (mapper MapperStep) Build() map[string]any {
 	return newMap
 }
 
+
+// getMapValue takes a map and slice of keys and then returns the value of the last key.
+func getMapValue(data any, keys []string) any {
+	if len(keys) > 1 {
+		key, keys := keys[0], keys[1:]
+		return getMapValue(data.(map[string]any)[key].(map[string]any), keys)
+	}
+	return data.(map[string]any)[keys[0]]
+}
+
+// setMapValue takes a map and slice of keys and then sets the value of the last key.
+func setMapValue(data map[string]any, keys []string, value any) {
+	if len(keys) == 1 {
+		data[keys[0]] = value
+	} else {
+		key, keys := keys[0], keys[1:]
+		setMapValue(data[key].(map[string]any), keys, value)
+	}
+}
+
 // AddData takes the newly made map and adds the data to it.
 func (mapper MapperStep) AddData(data map[string]any, newData map[string]any) map[string]any {
-	mapKeys := maps.Keys(mapper.MapConfig)
-	for _, key := range mapKeys {
-		keyLevels := strings.Split(key, ".")
-
-		var currentValue any
-		for keyLevel := range keyLevels{
-		}
+	for dataKeys, newKeys := range mapper.MapConfig {
+		keyNames := strings.Split(dataKeys, ".")
+		valueNames := strings.Split(newKeys, ".")
+		setMapValue(newData, valueNames, getMapValue(data, keyNames))
 	}
-
 
 	return newData
 }
