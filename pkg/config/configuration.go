@@ -3,12 +3,12 @@ package config
 import (
 	"config_con/pkg/pipe"
 	"config_con/pkg/pipe/consumer"
+	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/utils/environment"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
 )
-
 
 func ReadConfiguration() (YamlConfiguration, error) {
 	configFilePath := environment.Settings.ConfigFilePath
@@ -27,8 +27,8 @@ func ReadConfiguration() (YamlConfiguration, error) {
 	return configMap, nil
 }
 
-
 type YamlConfiguration struct {
-	Consumers []consumer.ConsumerConfig `yaml:"consumers"`
-	Pipelines []pipe.PipeConfig         `yaml:"pipelines"`
+	Consumers    consumer.ConsumerConfig       `yaml:"consumers"`
+	Transformers []transformer.TransformerConfig `yaml:"transformers"`
+	Pipelines    []pipe.PipeConfig               `yaml:"pipelines"`
 }

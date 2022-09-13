@@ -55,13 +55,14 @@ func TestMapperStep_AddData(t *testing.T) {
 		newData map[string]any
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   map[string]any
+		name    string
+		fields  fields
+		args    args
+		want    map[string]any
+		wantErr bool
 	}{
 		{
-			name: "TestMapperStep_AddData",
+			name: "TestMapperStep_AddData success",
 			fields: fields{
 				Name: "TestMapperStep_AddData",
 				MapConfig: map[string]string{
@@ -89,6 +90,33 @@ func TestMapperStep_AddData(t *testing.T) {
 				},
 				"single": "single key value",
 			},
+			wantErr: false,
+		},
+		{
+			name: "TestMapperStep_AddData success",
+			fields: fields{
+				Name: "TestMapperStep_AddData",
+				MapConfig: map[string]string{
+					"hello.there": "general.kenobi",
+					"single":      "single",
+				},
+			},
+			args: args{
+				data: map[string]any{
+					"hello": map[string]any{
+						"broken": "hello there value",
+					},
+					"single": "single key value",
+				},
+				newData: map[string]any{
+					"general": map[string]any{
+						"kenobi": map[string]any(nil),
+					},
+					"single": map[string]any(nil),
+				},
+			},
+			want:    map[string]any(nil),
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -97,8 +125,92 @@ func TestMapperStep_AddData(t *testing.T) {
 				Name:      tt.fields.Name,
 				MapConfig: tt.fields.MapConfig,
 			}
-			if got := mapper.AddData(tt.args.data, tt.args.newData); !reflect.DeepEqual(got, tt.want) {
+			got, err := mapper.AddData(tt.args.data, tt.args.newData)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MapperStep.AddData() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MapperStep.AddData() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMapperStep_Process(t *testing.T) {
+	type fields struct {
+		Name      string
+		MapConfig map[string]string
+	}
+	type args struct {
+		data any
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "TestMapperStep_Process success",
+			fields: fields{
+				Name: "TestMapperStep_Process",
+				MapConfig: map[string]string{
+					"hello.there": "general.kenobi",
+					"single":      "single",
+				},
+			},
+			args: args{
+				data: map[string]any{
+					"hello": map[string]any{
+						"there": "hello there value",
+					},
+					"single": "single key value",
+				},
+			},
+			want: map[string]any{
+				"general": map[string]any{
+					"kenobi": "hello there value",
+				},
+				"single": "single key value",
+			},
+			wantErr: false,
+		},
+		{
+			name: "TestMapperStep_Process failure",
+			fields: fields{
+				Name: "TestMapperStep_Process",
+				MapConfig: map[string]string{
+					"hello.there": "general.kenobi",
+					"single":      "single",
+				},
+			},
+			args: args{
+				data: map[string]any{
+					"hello": map[string]any{
+						"broken": "hello there value",
+					},
+					"single": "single key value",
+				},
+			},
+			want:    map[string]any(nil),
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mapper := MapperStep{
+				Name:      tt.fields.Name,
+				MapConfig: tt.fields.MapConfig,
+			}
+			got, err := mapper.Process(tt.args.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MapperStep.Process() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MapperStep.Process() = %v, want %v", got, tt.want)
 			}
 		})
 	}
