@@ -18,14 +18,12 @@ func TestReadConfiguration(t *testing.T) {
 		{
 			name: "ReadConfiguration",
 			want: YamlConfiguration{
-				Consumers: []consumer.ConsumerConfig{
-					{
-						TwitchEventConfigs: []twitch.TwitchEventConsumer{
-							{
-								Name:        "test_consumer",
-								EventSecret: "test_consumer_secret",
-								Url:         "test_consumer_url",
-							},
+				Consumers: consumer.ConsumerConfig{
+					TwitchEventConfigs: []twitch.TwitchEventConsumer{
+						{
+							Name:        "test_consumer",
+							EventSecret: "test_consumer_secret",
+							Url:         "test_consumer_url",
 						},
 					},
 				},

@@ -61,7 +61,7 @@ func (message TwitchEventMessage) GetData() any {
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
-func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.TransformerQueue) error {
+func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Queue) error {
 	signature, timestamp, messageId, messageType, err := getHeaders(ctx)
 	if err != nil {
 		ctx.Status(400)
@@ -115,7 +115,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Tra
 	})
 }
 
-func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.TransformerQueue) error {
+func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error {
 	server := api.GetServer()
 	return server.AddRoute("GET", con.Url, func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)

@@ -12,12 +12,12 @@ import (
 type Pipe struct {
 	Context          context.Context
 	Consumer         consumer.Consumer
-	TransformerQueue queue.TransformerQueue
+	TransformerQueue queue.Queue
 }
 
 var currentPipes map[string]Pipe
 
-func NewPipe(ctx context.Context, pipeName string, queue queue.TransformerQueue, consumer consumer.Consumer) error {
+func NewPipe(ctx context.Context, pipeName string, queue queue.Queue, consumer consumer.Consumer) error {
 	if _, ok := currentPipes[pipeName]; ok {
 		return fmt.Errorf("pipe %s already exists", pipeName)
 	}

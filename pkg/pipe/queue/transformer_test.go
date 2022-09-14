@@ -1,6 +1,5 @@
 package queue
 
-
 import (
 	"testing"
 )
@@ -14,9 +13,8 @@ func (m TestMessage) GetData() any {
 	return m.data
 }
 
-
 func TestTransformerQueue_Crud(t *testing.T) {
-	queue := TransformerQueue{
+	queue := Queue{
 		queue: make(chan Message, 1),
 	}
 
@@ -25,7 +23,7 @@ func TestTransformerQueue_Crud(t *testing.T) {
 		data:        "test",
 	}
 	queue.Add(message)
-	<- queue.Chan()
+	<-queue.Chan()
 	queue.Add(message)
 	<-queue.Chan()
 	queue.Close()

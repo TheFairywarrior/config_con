@@ -65,7 +65,7 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 		Url:         "url",
 	}
 
-	tQueue := queue.NewTransformerQueue(1)
+	tQueue := queue.NewQueue(1)
 
 	err := consumer.EventRoute(&fakeContext, tQueue)
 	assert.NoError(t, err)

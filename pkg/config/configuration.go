@@ -28,7 +28,7 @@ func ReadConfiguration() (YamlConfiguration, error) {
 }
 
 type YamlConfiguration struct {
-	Consumers    consumer.ConsumerConfig       `yaml:"consumers"`
+	Consumers    consumer.ConsumerConfig         `yaml:"consumers"`
 	Transformers []transformer.TransformerConfig `yaml:"transformers"`
 	Pipelines    []pipe.PipeConfig               `yaml:"pipelines"`
 }
