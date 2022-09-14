@@ -17,7 +17,7 @@ type Pipe struct {
 
 var currentPipes map[string]Pipe
 
-func NewPipe(ctx context.Context, pipeName string, queue queue.Queue, consumer consumer.Consumer) error {
+func NewPipe(ctx context.Context, pipeName string, queue queue.LocalQueue, consumer consumer.Consumer) error {
 	if _, ok := currentPipes[pipeName]; ok {
 		return fmt.Errorf("pipe %s already exists", pipeName)
 	}

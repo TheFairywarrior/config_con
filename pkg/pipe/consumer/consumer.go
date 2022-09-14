@@ -8,7 +8,7 @@ import (
 
 // Consumer interface is used in the pipeline to consume the data from multiple sources.
 type Consumer interface {
-	Consume(context.Context, queue.Queue) error
+	Consume(context.Context, queue.LocalQueue) error
 }
 
 type ConsumerConfig struct {

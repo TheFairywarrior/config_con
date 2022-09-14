@@ -14,7 +14,7 @@ func (m TestMessage) GetData() any {
 }
 
 func TestTransformerQueue_Crud(t *testing.T) {
-	queue := Queue{
+	queue := LocalQueue{
 		queue: make(chan Message, 1),
 	}
 
