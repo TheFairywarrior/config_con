@@ -31,7 +31,22 @@ type TransformerConfig struct {
 	Steps        StepConfig            `yaml:"steps"`
 }
 
+func (config TransformerConfig) GetTransformerMap() map[string]Transformer {
+	transformerMap := make(map[string]Transformer)
+	steps := config.Steps.GetStepMap()
+	for _, transformer := range config.Transformers {
+		transformerSteps := []Step{}
 
+		for _, stepName := range transformer.Steps {
+			transformerSteps = append(transformerSteps, steps[stepName])
+		}
+		transformerMap[transformer.Name] = Transformer{
+			Name:  transformer.Name,
+			Steps: transformerSteps,
+		}
+	}
+	return transformerMap
+}
 
 type Transformer struct {
 	Name  string
