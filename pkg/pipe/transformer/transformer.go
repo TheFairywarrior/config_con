@@ -28,7 +28,7 @@ type TransformerStepConfig struct {
 // TransformerConfig holds the configuration for the transformers.
 type TransformerConfig struct {
 	Transformers []TransformerStepConfig `yaml:"transformers"`
-	Steps        StepConfig            `yaml:"steps"`
+	Steps        StepConfig              `yaml:"steps"`
 }
 
 func (config TransformerConfig) GetTransformerMap() map[string]Transformer {

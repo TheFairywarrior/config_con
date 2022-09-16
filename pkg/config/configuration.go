@@ -4,7 +4,6 @@ import (
 	"config_con/pkg/pipe"
 	"config_con/pkg/pipe/consumer"
 	"config_con/pkg/pipe/publisher"
-	"config_con/pkg/pipe/queue"
 	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/utils/environment"
 	"context"
@@ -37,24 +36,21 @@ type YamlConfiguration struct {
 	Pipelines    []pipe.PipeConfig             `yaml:"pipelines"`
 }
 
-func (config YamlConfiguration) CreatePipelines(cxt context.Context) error {
+// CreatePipelines builds the pipelines from the configuration.
+func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string]pipe.Pipe, error) {
 	consumers := config.Consumers.GetConsumerMap()
 	transformers := config.Transformers.GetTransformerMap()
 	publishers := config.Publishers.GetPublisherMap()
 
+	pipes := make(map[string]pipe.Pipe, len(config.Pipelines))
 	for _, pipeline := range config.Pipelines {
-		err := pipe.NewPipe(
+		pipe := pipe.NewPipe(
 			cxt,
-			pipeline.Name,
-			queue.LocalQueue{},
 			consumers[pipeline.Consumer],
 			transformers[pipeline.Transformer],
-			queue.LocalQueue{},
 			publishers[pipeline.Publisher],
 		)
-		if err != nil {
-			return err
-		}
+		pipes[pipeline.Name] = pipe
 	}
-	return nil
+	return pipes, nil
 }
