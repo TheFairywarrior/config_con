@@ -7,14 +7,19 @@ import (
 )
 
 type Message interface {
-	GetData() any
+	GetData() (any, error)
 	ID() string
 	Timestamp() time.Time
+	Meta() MessageData
 }
 
 type MessageData struct {
 	id        string
 	timestamp time.Time
+}
+
+func (m MessageData) Meta() MessageData {
+	return m
 }
 
 func (m MessageData) ID() string {

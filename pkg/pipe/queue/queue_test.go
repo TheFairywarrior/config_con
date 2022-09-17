@@ -9,8 +9,8 @@ type TestMessage struct {
 	data string
 }
 
-func (m TestMessage) GetData() any {
-	return m.data
+func (m TestMessage) GetData() (any, error) {
+	return m.data, nil
 }
 
 func TestTransformerQueue_Crud(t *testing.T) {
