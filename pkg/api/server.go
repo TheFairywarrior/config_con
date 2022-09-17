@@ -37,7 +37,7 @@ func (s Server) AddRoute(method, path string, function func(*fiber.Ctx) error) e
 }
 
 // Run starts the server.
-func (s Server) Consume(cxt context.Context) error {
+func (s Server) StartServer(cxt context.Context) error {
 	go log.Fatal(s.server.Listen(":3000"))
 	<-cxt.Done()
 	return s.server.Shutdown()

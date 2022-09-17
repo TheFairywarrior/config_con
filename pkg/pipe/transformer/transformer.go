@@ -102,6 +102,8 @@ func (transformer Transformer) transform(inMessage queue.Message, outQueue queue
 	return transformer.sendMessage(output, outQueue)
 }
 
+// StartTransformer is the controller for the transformer.
+// It will start the transformer and will listen for messages, as well as waiting for cxt to be done.
 func (transformer Transformer) StartTransformer(cxt context.Context, inQueue queue.Queue, outQueue queue.Queue) {
 	for {
 		select {
