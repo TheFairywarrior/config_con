@@ -3,8 +3,10 @@ package transformer
 import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/pipe/transformer/steps"
+	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type Step interface {
@@ -62,12 +64,14 @@ func (m TransformerMessage) GetData() (any, error) {
 	return json.Marshal(m.Data)
 }
 
+
+// Transformer is the management point of the transformer.
 type Transformer struct {
 	Name  string
 	Steps []Step
 }
 
-func (transformer Transformer) RunSteps(input queue.Message) (any, error) {
+func (transformer Transformer) runSteps(input queue.Message) (any, error) {
 	output, err := input.GetData()
 	if err != nil {
 		return nil, err
@@ -81,11 +85,35 @@ func (transformer Transformer) RunSteps(input queue.Message) (any, error) {
 	return output, nil
 }
 
-func (transformer Transformer) Transform(inMessage queue.Message, outQueue queue.Queue) error {
-	output, err := transformer.RunSteps(inMessage)
+func (transformer Transformer) sendMessage(output any, outQueue queue.Queue) error {
+	message := TransformerMessage{
+		queue.NewMessageData(),
+		output,
+	}
+	return outQueue.Add(message)
+}
+
+func (transformer Transformer) transform(inMessage queue.Message, outQueue queue.Queue) error {
+	output, err := transformer.runSteps(inMessage)
 	if err != nil {
 		return err
 	}
-	fmt.Println(output)
-	return nil
+
+	return transformer.sendMessage(output, outQueue)
+}
+
+func (transformer Transformer) StartTransformer(cxt context.Context, inQueue queue.Queue, outQueue queue.Queue) {
+	for {
+		select {
+		case <-cxt.Done():
+			return
+		case inMessage := <-inQueue.Chan():
+			err := transformer.transform(inMessage, outQueue)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		default:
+			time.Sleep(10 * time.Second)
+		}
+	}
 }

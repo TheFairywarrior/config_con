@@ -123,7 +123,6 @@ func TestTransformerConfig_BuildTransformerMap(t *testing.T) {
 	}
 }
 
-
 type fakeStep struct {
 	name string
 }
@@ -173,7 +172,7 @@ func TestTransformer_RunSteps(t *testing.T) {
 				Name:  tt.fields.Name,
 				Steps: tt.fields.Steps,
 			}
-			got, err := transformer.RunSteps(tt.args.input)
+			got, err := transformer.runSteps(tt.args.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Transformer.RunSteps() error = %v, wantErr %v", err, tt.wantErr)
 				return
