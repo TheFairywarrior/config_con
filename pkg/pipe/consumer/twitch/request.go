@@ -12,10 +12,10 @@ import (
 // If headers are missing an error is returned.
 // If all of the headers are present, it seperates and returns them.
 func getHeaders(ctx override.FiberContext) (string, string, string, string, error) {
-	signature, sOk := ctx.GetReqHeaders()["twitch-eventsub-message-signature"]
-	timestamp, tOk := ctx.GetReqHeaders()["twitch-eventsub-message-timestamp"]
-	messageId, mOk := ctx.GetReqHeaders()["twitch-eventsub-message-id"]
-	messageType, mTOk := ctx.GetReqHeaders()["twitch-eventsub-message-type"]
+	signature, sOk := ctx.GetReqHeaders()["Twitch-Eventsub-Message-Signature"]
+	timestamp, tOk := ctx.GetReqHeaders()["Twitch-Eventsub-Message-Timestamp"]
+	messageId, mOk := ctx.GetReqHeaders()["Twitch-Eventsub-Message-Id"]
+	messageType, mTOk := ctx.GetReqHeaders()["Twitch-Eventsub-Message-Type"]
 
 	if !sOk || !tOk || !mOk || !mTOk {
 		return "", "", "", "", fmt.Errorf("missing headers, required headers are twitch-eventsub-message-signature, twitch-eventsub-message-timestamp, twitch-eventsub-message-id, twitch-eventsub-message-type")

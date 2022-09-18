@@ -9,8 +9,8 @@ import (
 
 // MapperStep is used to map a maps field to another one.
 type MapperStep struct {
-	Name      string
-	MapConfig map[string]string
+	Name      string            `yaml:"name"`
+	MapConfig map[string]string `yaml:"mapConfig"`
 }
 
 func MapConstructor(keys []string) map[string]any {

@@ -7,6 +7,7 @@ import (
 	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/utils/environment"
 	"context"
+	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
@@ -44,11 +45,26 @@ func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string
 
 	pipes := make(map[string]pipe.Pipe, len(config.Pipelines))
 	for _, pipeline := range config.Pipelines {
+		consumer, ok := consumers[pipeline.Consumer]
+		if !ok {
+			return nil, fmt.Errorf("consumer %s not found", pipeline.Consumer)
+		}
+
+		transformer, ok := transformers[pipeline.Transformer]
+		if !ok {
+			return nil, fmt.Errorf("transformer %s not found", pipeline.Transformer)
+		}
+
+		publisher, ok := publishers[pipeline.Publisher]
+		if !ok {
+			return nil, fmt.Errorf("publisher %s not found", pipeline.Publisher)
+		}
+
 		pipe := pipe.NewPipe(
 			cxt,
-			consumers[pipeline.Consumer],
-			transformers[pipeline.Transformer],
-			publishers[pipeline.Publisher],
+			consumer,
+			transformer,
+			publisher,
 		)
 		pipes[pipeline.Name] = pipe
 	}

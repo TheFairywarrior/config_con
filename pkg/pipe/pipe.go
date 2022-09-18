@@ -26,6 +26,11 @@ func (pipe Pipe) Start() {
 	
 	publisherRunner := publisher.NewPublisherRunner(pipe.publisher, publisherQueue)
 	go publisherRunner.RunPublisher(pipe.cxt)
+	go func() {
+		<-pipe.cxt.Done()
+		transformerQueue.Close()
+		publisherQueue.Close()
+	}()
 }
 
 func NewPipe(

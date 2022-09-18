@@ -148,6 +148,62 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "CreatePipelines_Test_Invalid_Pipeline",
+			fields: fields{
+				Consumers: consumer.ConsumerConfig{
+					TwitchEventConfigs: []twitch.TwitchEventConsumer{
+						{
+							Name:        "doesnt_exist",
+							EventSecret: "test_consumer_secret",
+							Url:         "test_consumer_url",
+						},
+					},
+				},
+				Transformers: transformer.TransformerConfig{
+					Transformers: []transformer.TransformerStepConfig{
+						{
+							Name: "test_transformer",
+							Steps: []string{
+								"test_step",
+							},
+						},
+					},
+					Steps: transformer.StepConfig{
+						HashMapperSteps: []steps.MapperStep{
+							{
+								Name: "test_step",
+								MapConfig: map[string]string{
+									"test_key": "test_value",
+								},
+							},
+						},
+					},
+				},
+				Publishers: publisher.PublisherConfig{
+					FilePublisher: []file.FilePublisher{
+						{
+							Name:     "test_publisher",
+							FilePath: "test_path",
+							FileMode: 0644,
+						},
+					},
+				},
+				Pipelines: []pipe.PipeConfig{
+					{
+						Name:        "test_pipeline",
+						Consumer:    "test_consumer",
+						Transformer: "test_transformer",
+						Publisher:   "test_publisher",
+					},
+				},
+			},
+			args: args{
+				cxt: context.Background(),
+			},
+			want: map[string]pipe.Pipe{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -110,14 +110,12 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 	q.Add(message)
 
 	ctx.Status(200)
-	return ctx.JSON(fiber.Map{
-		"message": "Success",
-	})
+	return nil
 }
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error {
 	server := api.GetServer()
-	return server.AddRoute("GET", con.Url, func(ctx *fiber.Ctx) error {
+	return server.AddRoute("POST", con.Url, func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)
 	})
 }

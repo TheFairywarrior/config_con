@@ -1,6 +1,25 @@
 consumers:
-  - twitch_event:
-      type: api.twitch.event
-      configuration: 
-        event_secret: secret
-        event_webhook_route: /twitch/event
+  twitchConfig: 
+    - eventSecret: 5f1a6e7cd2e7137ccf9e15b2f43fe63949eb84b1db83c1d5a867dc93429de4e4
+      url: /event
+      name: twitch_event_consumer
+transformers:
+  transformers:
+    - name: map_twitch_event
+      steps:
+        - event_mapper_step
+  steps:
+    hashMapperSteps: 
+      - name: map_twitch_event
+        mapConfig:
+          event: event
+publishers:
+  filePublishers:
+    - name: saving_file
+      filePath: testfile.json
+      fileMode: 666
+pipelines:
+  - name: twitch_event_pipe
+    consumer: twitch_event_consumer
+    transformer: map_twitch_event
+    publisher: saving_file
