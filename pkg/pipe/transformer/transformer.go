@@ -38,21 +38,26 @@ type TransformerConfig struct {
 	Steps        StepConfig              `yaml:"steps"`
 }
 
-func (config TransformerConfig) GetTransformerMap() map[string]Transformer {
+func (config TransformerConfig) GetTransformerMap() (map[string]Transformer, error) {
 	transformerMap := make(map[string]Transformer)
 	steps := config.Steps.GetStepMap()
 	for _, transformer := range config.Transformers {
 		transformerSteps := []Step{}
 
 		for _, stepName := range transformer.Steps {
-			transformerSteps = append(transformerSteps, steps[stepName])
+			step, ok := steps[stepName]
+			if !ok {
+				return nil, fmt.Errorf("transformer '%s' had an error: step \"%s\" not found", transformer.Name, stepName)
+			}
+
+			transformerSteps = append(transformerSteps, step)
 		}
 		transformerMap[transformer.Name] = Transformer{
 			Name:  transformer.Name,
 			Steps: transformerSteps,
 		}
 	}
-	return transformerMap
+	return transformerMap, nil
 }
 
 type TransformerMessage struct {

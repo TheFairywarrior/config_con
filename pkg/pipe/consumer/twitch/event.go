@@ -47,6 +47,7 @@ type event struct {
 }
 
 type TwitchEventData struct {
+	Challenge    string       `json:"challenge"`
 	Subscription subscription `json:"subscription"`
 	Event        event        `json:"event"`
 }
@@ -57,7 +58,10 @@ type TwitchEventMessage struct {
 }
 
 func (message TwitchEventMessage) GetData() (any, error) {
-	return message.TwitchEventData, nil
+	jsonData, _ := json.Marshal(message.TwitchEventData)
+	var data map[string]any
+	err := json.Unmarshal(jsonData, &data)
+	return data, err
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
@@ -68,15 +72,6 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 		return ctx.JSON(fiber.Map{
 			"error": err.Error(),
 		})
-	}
-
-	if messageType == "webhook_callback_verification" {
-		ctx.Status(200)
-		return ctx.JSON(
-			fiber.Map{
-				"message": "Verified",
-			},
-		)
 	}
 
 	var payload TwitchEventData
@@ -92,8 +87,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 			body,
 		)
 	}
-	payloadJson, _ := json.Marshal(payload)
-	if !con.verifyEvent(messageId+timestamp+string(payloadJson), signature) {
+	if !con.verifyEvent(messageId+timestamp+string(ctx.Body()), signature) {
 		ctx.Status(402)
 		return ctx.JSON(
 			fiber.Map{
@@ -101,6 +95,11 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 				"message": "Signature does not match",
 			},
 		)
+	}
+
+	if messageType == "webhook_callback_verification" {
+		ctx.Status(200)
+		return ctx.Send([]byte(payload.Challenge))
 	}
 
 	message := TwitchEventMessage{

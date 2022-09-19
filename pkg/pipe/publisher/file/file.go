@@ -10,7 +10,7 @@ type FilePublisher struct {
 }
 
 func (publisher FilePublisher) Publish(data []byte) error {
-	file, err := os.OpenFile(publisher.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(publisher.FileMode))
+	file, err := os.OpenFile(publisher.FilePath, os.O_APPEND|os.O_CREATE, os.FileMode(publisher.FileMode))
 	if err != nil {
 		return err
 	}

@@ -56,6 +56,7 @@ func TestStepConfig_GetStepMap(t *testing.T) {
 			stepConfig := StepConfig{
 				HashMapperSteps: tt.fields.HashMapperSteps,
 			}
+
 			if got := stepConfig.GetStepMap(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("StepConfig.GetStepMap() = %v, want %v", got, tt.want)
 			}
@@ -69,12 +70,13 @@ func TestTransformerConfig_BuildTransformerMap(t *testing.T) {
 		Steps        StepConfig
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   map[string]Transformer
+		name    string
+		fields  fields
+		want    map[string]Transformer
+		wantErr bool
 	}{
 		{
-			name: "TestTransformerConfig_BuildTransformerMap",
+			name: "Test successful config",
 			fields: fields{
 				Transformers: []TransformerStepConfig{
 					{
@@ -108,6 +110,32 @@ func TestTransformerConfig_BuildTransformerMap(t *testing.T) {
 					},
 				},
 			},
+			wantErr: false,
+		},
+		{
+			name: "Test non existent step",
+			fields: fields{
+				Transformers: []TransformerStepConfig{
+					{
+						Name: "transformer1",
+						Steps: []string{
+							"nonexistent",
+						},
+					},
+				},
+				Steps: StepConfig{
+					HashMapperSteps: []steps.MapperStep{
+						{
+							Name: "from1toone",
+							MapConfig: map[string]string{
+								"thing.one": "value",
+							},
+						},
+					},
+				},
+			},
+			want: map[string]Transformer(nil),
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -116,8 +144,12 @@ func TestTransformerConfig_BuildTransformerMap(t *testing.T) {
 				Transformers: tt.fields.Transformers,
 				Steps:        tt.fields.Steps,
 			}
-			if got := config.GetTransformerMap(); !reflect.DeepEqual(got, tt.want) {
+			got, err := config.GetTransformerMap()
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TransformerConfig.BuildTransformerMap() = %v, want %v", got, tt.want)
+			}
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TransformerConfig.BuildTransformerMap() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

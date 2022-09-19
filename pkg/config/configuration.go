@@ -40,8 +40,14 @@ type YamlConfiguration struct {
 // CreatePipelines builds the pipelines from the configuration.
 func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string]pipe.Pipe, error) {
 	consumers := config.Consumers.GetConsumerMap()
-	transformers := config.Transformers.GetTransformerMap()
+	transformers, err := config.Transformers.GetTransformerMap()
+
+	if err != nil {
+		return nil, err
+	}
+
 	publishers := config.Publishers.GetPublisherMap()
+	
 
 	pipes := make(map[string]pipe.Pipe, len(config.Pipelines))
 	for _, pipeline := range config.Pipelines {

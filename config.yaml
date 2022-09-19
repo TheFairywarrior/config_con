@@ -5,21 +5,21 @@ consumers:
       name: twitch_event_consumer
 transformers:
   transformers:
-    - name: map_twitch_event
+    - name: map_twitch_event_transformer
       steps:
-        - event_mapper_step
+        - map_twitch_event_step
   steps:
     hashMapperSteps: 
-      - name: map_twitch_event
+      - name: map_twitch_event_step
         mapConfig:
           event: event
 publishers:
   filePublishers:
     - name: saving_file
       filePath: testfile.json
-      fileMode: 666
+      fileMode: 777
 pipelines:
   - name: twitch_event_pipe
     consumer: twitch_event_consumer
-    transformer: map_twitch_event
+    transformer: map_twitch_event_transformer
     publisher: saving_file

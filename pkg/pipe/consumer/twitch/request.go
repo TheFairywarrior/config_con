@@ -28,7 +28,7 @@ func getHeaders(ctx override.FiberContext) (string, string, string, string, erro
 func (con TwitchEventConsumer) verifyEvent(message, messageSignature string) bool {
 	prefix := "sha256="
 	mac := hmac.New(sha256.New, []byte(con.EventSecret))
-	mac.Write([]byte(prefix + message))
+	mac.Write([]byte(message))
 	sigCheck := prefix + hex.EncodeToString(mac.Sum(nil))
-	return messageSignature == sigCheck
+	return hmac.Equal([]byte(sigCheck), []byte(messageSignature))
 }

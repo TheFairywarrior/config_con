@@ -7,4 +7,6 @@ type FiberContext interface {
 	GetReqHeaders() map[string]string
 	Status(status int) *fiber.Ctx
 	JSON(interface{}) error
+	Send([]byte) error
+	Body() []byte
 }

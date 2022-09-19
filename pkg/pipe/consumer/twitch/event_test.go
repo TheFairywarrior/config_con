@@ -18,6 +18,7 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	timestamp := "2022-10-10T10:10:10Z"
 	messageId := "12345"
 	payload := TwitchEventData{
+		Challenge: "",
 		Subscription: subscription{
 			Id:        "id",
 			Status:    "status",
@@ -45,17 +46,17 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	jsonData, _ := json.Marshal(payload)
 	mac := hmac.New(sha256.New, []byte(eventSecret))
 	secretBody := messageId + timestamp + string(jsonData)
-	mac.Write([]byte("sha256=" + secretBody))
+	mac.Write([]byte(secretBody))
 	h := mac.Sum(nil)
 	signature := "sha256=" + hex.EncodeToString(h)
 	fakeContext := test.FakeFiberContext{
-		Body: []byte(jsonData),
+		RequestBody: []byte(jsonData),
 		Headers: map[string]string{
 			"X-Hub-Signature":                   signature,
-			"twitch-eventsub-message-signature": signature,
-			"twitch-eventsub-message-id":        messageId,
-			"twitch-eventsub-message-timestamp": timestamp,
-			"twitch-eventsub-message-type":      "type",
+			"Twitch-Eventsub-Message-Signature": signature,
+			"Twitch-Eventsub-Message-Id":        messageId,
+			"Twitch-Eventsub-Message-Timestamp": timestamp,
+			"Twitch-Eventsub-Message-Type":      "type",
 		},
 	}
 
@@ -73,13 +74,13 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	<-tQueue.Chan()
 
 	fakeContext = test.FakeFiberContext{
-		Body: []byte(jsonData),
+		RequestBody: []byte(jsonData),
 		Headers: map[string]string{
 			"X-Hub-Signature":                   signature,
-			"twitch-eventsub-message-signature": signature,
-			"twitch-eventsub-message-id":        messageId,
-			"twitch-eventsub-message-timestamp": timestamp,
-			"twitch-eventsub-message-type":      "webhook_callback_verification",
+			"Twitch-Eventsub-Message-Signature": signature,
+			"Twitch-Eventsub-Message-Id":        messageId,
+			"Twitch-Eventsub-Message-Timestamp": timestamp,
+			"Twitch-Eventsub-Message-Type":      "webhook_callback_verification",
 		},
 	}
 	err = consumer.EventRoute(&fakeContext, tQueue)
@@ -90,13 +91,13 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 		"broken": "data",
 	})
 	fakeContext = test.FakeFiberContext{
-		Body: brokenData,
+		RequestBody: brokenData,
 		Headers: map[string]string{
 			"X-Hub-Signature":                   signature,
-			"twitch-eventsub-message-signature": "signature",
-			"twitch-eventsub-message-id":        messageId,
-			"twitch-eventsub-message-timestamp": timestamp,
-			"twitch-eventsub-message-type":      "type",
+			"Twitch-Eventsub-Message-Signature": "signature",
+			"Twitch-Eventsub-Message-Id":        messageId,
+			"Twitch-Eventsub-Message-Timestamp": timestamp,
+			"Twitch-Eventsub-Message-Type":      "type",
 		},
 	}
 	err = consumer.EventRoute(&fakeContext, tQueue)
