@@ -1,6 +1,14 @@
 # Config Connector
 The concept of the Configurable Connector is to be as modular as possible. Each module will control a different segment of the connection and publishing of the data. 
 
+## Setup
+To setup the Configurable Connector, you will need to have [GoLang](https://golang.org/doc/install) version 1.18 or higher installed.
+
+### Documentation
+For full documentation on the configuraable connector look into the [docs](docs/README.md) folder.
+
+To view the drawio files that contain the diagrams for the configurable connector, you will need to either install the drawio plugin for VSCode or go to [draw.io](https://app.diagrams.net/) and open the files from there.
+
 ## Architecture
 
 ### Queue Objects
@@ -11,7 +19,14 @@ The `QueueObjects` can be seen as a simple `chan` for the most part, for the loc
 Using a `QueueObjects` object instead of just a channel means that horizontal scaling would be more possible because that logic can be held within the `QueueObjects` instead of having to be added into the pipe afterwards as its own step.
 
 ### Consumer
-The consumer is responsible for retrieving the data from the specified data source. This is done by using an `interface` called `Consumer` that will use a method `Consume(Context, ConsumerQueue)`. This method will run a service that can connect to the data source using the provided credentials.
+The consumer is responsible for retrieving the data from the specified data source. This is done by using an `interface` called `Consumer` that will use a method `Consume(context.Context, queue.Queue) error`. This method will run a service that can connect to the data source using the provided credentials.
+
+The different types of consumers can be split into 3 types (though only one is made at the moment). Those types are "API", "Listener" and "Retriever".
+* API: Is basically a GoFiber route that is going to be added to the main api server that is always run with the service. (This is the only consumer type currently setup)
+* Listener: Is a service that is going to be listening for data to be pushed to it.
+* Retriever: Is a service that is going to be retrieving data from a data source. Either consistently or on a schedule.
+
+Each consumer type will can then be broken down into the specific consumers for specific data sources.
 
 Once the consumer has gotten the data from the datasource then it will pass it to the `TransformQueue`.
 
@@ -35,24 +50,21 @@ consumers:
     - <consumer type>:
         <cosnumer type configuration>
 transformers:
-    - <transformer identifier>:
-        steps: 
-            - <step 1 name>
-            - <step 2 name>
+    transformers:
+        - <transformer identifier>:
+            steps: 
+                - <step 1 name>
+                - <step 2 name>
+    steps:
+        - <step type>:
+            - <step configuration>
 publishers:
-    - <publisher identifier>:
-        type: <publisher type>
-        configuration: <publisher specific config>
+    - <publisher type>:
+        - <publisher type configurations>
+        
 pipelines:
-    - <pipeline identifier>:
-        consumer: 
-            id: <consumer identifier>
-            worker_count: 0
-        transformer:
-            id: <transformer identifier>
-            worker_count: 0
-        publisher:
-            id: <transformer identifier>
-            worker_count: 0
-            extra: <extras required for publishing (Possibly topic)>
+    - <pipeline identifier>
+      consumer: <consumer name>
+      transformer: <transformer name>
+      publisher: <publisher name>
 ```
