@@ -3,9 +3,10 @@ package config
 import (
 	"config_con/pkg/config/consumer"
 	twitchConfig "config_con/pkg/config/consumer/twitch"
+	"config_con/pkg/config/publisher"
+	fileConfig "config_con/pkg/config/publisher/file"
 	"config_con/pkg/pipe"
 	"config_con/pkg/pipe/consumer/twitch"
-	"config_con/pkg/pipe/publisher"
 	"config_con/pkg/pipe/publisher/file"
 	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/pipe/transformer/steps"
@@ -101,7 +102,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 					},
 				},
 				Publishers: publisher.PublisherConfig{
-					FilePublisher: []file.FilePublisher{
+					FilePublisherConfig: []fileConfig.FilePublisherConfig{
 						{
 							Name:     "test_publisher",
 							FilePath: "test_path",
@@ -136,11 +137,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 							},
 						},
 					},
-					file.FilePublisher{
-						Name:     "test_publisher",
-						FilePath: "test_path",
-						FileMode: 0644,
-					},
+					file.NewFilePublisher("test_publisher", "test_path", 0644),
 				),
 			},
 			wantErr: false,
@@ -178,7 +175,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 					},
 				},
 				Publishers: publisher.PublisherConfig{
-					FilePublisher: []file.FilePublisher{
+					FilePublisherConfig: []fileConfig.FilePublisherConfig{
 						{
 							Name:     "test_publisher",
 							FilePath: "test_path",

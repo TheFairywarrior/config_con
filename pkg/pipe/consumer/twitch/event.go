@@ -17,15 +17,15 @@ type TwitchEventConsumer struct {
 	url         string `yaml:"url"`
 }
 
-func (con TwitchEventConsumer) GetName() string {
+func (con TwitchEventConsumer) Name() string {
 	return con.name
 }
 
-func (con TwitchEventConsumer) GetEventSecret() string {
+func (con TwitchEventConsumer) EventSecret() string {
 	return con.eventSecret
 }
 
-func (con TwitchEventConsumer) GetUrl() string {
+func (con TwitchEventConsumer) Url() string {
 	return con.url
 }
 
@@ -94,7 +94,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error {
 	server := api.GetServer()
-	return server.AddRoute("POST", con.GetUrl(), func(ctx *fiber.Ctx) error {
+	return server.AddRoute("POST", con.Url(), func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)
 	})
 }

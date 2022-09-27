@@ -12,8 +12,8 @@ func TestFilePublisher_Publish(t *testing.T) {
 	filePath := "test.txt"
 	defer os.Remove(filePath)
 	publisher := FilePublisher{
-		FilePath: filePath,
-		FileMode: 0644,
+		filePath: filePath,
+		fileMode: 0644,
 	}
 
 	err := publisher.Publish([]byte("test"))

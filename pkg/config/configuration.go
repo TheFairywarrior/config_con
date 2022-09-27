@@ -3,7 +3,7 @@ package config
 import (
 	"config_con/pkg/pipe"
 	"config_con/pkg/config/consumer"
-	"config_con/pkg/pipe/publisher"
+	"config_con/pkg/config/publisher"
 	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/utils/environment"
 	"context"
