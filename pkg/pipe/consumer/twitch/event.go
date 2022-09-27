@@ -12,49 +12,29 @@ import (
 )
 
 type TwitchEventConsumer struct {
-	Name        string `yaml:"name"`
-	EventSecret string `yaml:"eventSecret"`
-	Url         string `yaml:"url"`
+	name        string `yaml:"name"`
+	eventSecret string `yaml:"eventSecret"`
+	url         string `yaml:"url"`
 }
 
-type condition struct {
-	BroadCasterUserId string `json:"broadcaster_user_id"`
+func (con TwitchEventConsumer) GetName() string {
+	return con.name
 }
 
-type transport struct {
-	Method   string `json:"method"`
-	Callback string `json:"callback"`
+func (con TwitchEventConsumer) GetEventSecret() string {
+	return con.eventSecret
 }
 
-type subscription struct {
-	Id        string    `json:"id"`
-	Status    string    `json:"status"`
-	EventType string    `json:"type"`
-	Version   string    `json:"version"`
-	Cost      int       `json:"cost"`
-	Condition condition `json:"condition"`
-	Transport transport `json:"transport"`
-	CreatedAt string    `json:"created_at"`
+func (con TwitchEventConsumer) GetUrl() string {
+	return con.url
 }
 
-type event struct {
-	UserId               string `json:"user_id"`
-	UserLogin            string `json:"user_login"`
-	UserName             string `json:"user_name"`
-	BroadCasterUserId    string `json:"broadcaster_user_id"`
-	BroadCasterUserLogin string `json:"broadcaster_user_login"`
-	BroadCasterUserName  string `json:"broadcaster_user_name"`
-}
-
-type TwitchEventData struct {
-	Challenge    string       `json:"challenge"`
-	Subscription subscription `json:"subscription"`
-	Event        event        `json:"event"`
-}
-
-type TwitchEventMessage struct {
-	queue.MessageData
-	TwitchEventData
+func NewTwitchEventConsumer(name string, eventSecret string, url string) TwitchEventConsumer {
+	return TwitchEventConsumer{
+		name:        name,
+		eventSecret: eventSecret,
+		url:         url,
+	}
 }
 
 func (message TwitchEventMessage) GetData() (any, error) {
@@ -114,7 +94,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error {
 	server := api.GetServer()
-	return server.AddRoute("POST", con.Url, func(ctx *fiber.Ctx) error {
+	return server.AddRoute("POST", con.GetUrl(), func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)
 	})
 }

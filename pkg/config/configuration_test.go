@@ -1,8 +1,9 @@
 package config
 
 import (
+	"config_con/pkg/config/consumer"
+	twitchConfig "config_con/pkg/config/consumer/twitch"
 	"config_con/pkg/pipe"
-	"config_con/pkg/pipe/consumer"
 	"config_con/pkg/pipe/consumer/twitch"
 	"config_con/pkg/pipe/publisher"
 	"config_con/pkg/pipe/publisher/file"
@@ -25,7 +26,7 @@ func TestReadConfiguration(t *testing.T) {
 			name: "ReadConfiguration",
 			want: YamlConfiguration{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitch.TwitchEventConsumer{
+					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
 							EventSecret: "test_consumer_secret",
@@ -71,7 +72,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			name: "CreatePipelines_Test",
 			fields: fields{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitch.TwitchEventConsumer{
+					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
 							EventSecret: "test_consumer_secret",
@@ -123,11 +124,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			want: map[string]pipe.Pipe{
 				"test_pipeline": pipe.NewPipe(
 					context.Background(),
-					twitch.TwitchEventConsumer{
-						Name:        "test_consumer",
-						EventSecret: "test_consumer_secret",
-						Url:         "test_consumer_url",
-					},
+					twitch.NewTwitchEventConsumer("test_consumer", "test_consumer_secret", "test_consumer_url"),
 					transformer.Transformer{
 						Name: "test_transformer",
 						Steps: []transformer.Step{
@@ -152,7 +149,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			name: "CreatePipelines_Test_Invalid_Pipeline",
 			fields: fields{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitch.TwitchEventConsumer{
+					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
 						{
 							Name:        "doesnt_exist",
 							EventSecret: "test_consumer_secret",
@@ -201,7 +198,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			args: args{
 				cxt: context.Background(),
 			},
-			want: map[string]pipe.Pipe{},
+			want:    map[string]pipe.Pipe{},
 			wantErr: true,
 		},
 	}

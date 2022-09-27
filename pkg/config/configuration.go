@@ -2,7 +2,7 @@ package config
 
 import (
 	"config_con/pkg/pipe"
-	"config_con/pkg/pipe/consumer"
+	"config_con/pkg/config/consumer"
 	"config_con/pkg/pipe/publisher"
 	"config_con/pkg/pipe/transformer"
 	"config_con/pkg/utils/environment"
@@ -47,7 +47,6 @@ func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string
 	}
 
 	publishers := config.Publishers.GetPublisherMap()
-	
 
 	pipes := make(map[string]pipe.Pipe, len(config.Pipelines))
 	for _, pipeline := range config.Pipelines {

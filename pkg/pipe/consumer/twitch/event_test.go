@@ -61,9 +61,9 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	}
 
 	consumer := TwitchEventConsumer{
-		Name:        "test",
-		EventSecret: eventSecret,
-		Url:         "url",
+		name:        "test",
+		eventSecret: eventSecret,
+		url:         "url",
 	}
 
 	tQueue := queue.NewQueue(1)
