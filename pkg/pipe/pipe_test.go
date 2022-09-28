@@ -3,6 +3,7 @@ package pipe
 import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/pipe/transformer"
+	"config_con/pkg/pipe/transformer/steps"
 	"context"
 	"testing"
 )
@@ -21,13 +22,15 @@ func (fC fakeConsumer) Consume(ctx context.Context, queue queue.Queue) error {
 	return nil
 }
 
+type fakeStep struct {
+
+}
+
+
 func TestPipe_Start(t *testing.T) {
 	fP := fakePublisher{}
 	fC := fakeConsumer{}
-	trans := transformer.Transformer{
-		Name:  "name",
-		Steps: []transformer.Step{},
-	}
+	trans := transformer.NewTransformer("name", []steps.Step{})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

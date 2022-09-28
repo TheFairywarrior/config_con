@@ -13,6 +13,13 @@ type MapperStep struct {
 	MapConfig map[string]string `yaml:"mapConfig"`
 }
 
+func NewMapperStep(name string, mapConfig map[string]string) MapperStep {
+	return MapperStep{
+		Name:      name,
+		MapConfig: mapConfig,
+	}
+}
+
 func MapConstructor(keys []string) map[string]any {
 	if len(keys) > 0 {
 		key, keys := keys[0], keys[1:]

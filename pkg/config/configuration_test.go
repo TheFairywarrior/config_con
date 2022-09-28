@@ -9,6 +9,7 @@ import (
 	"config_con/pkg/pipe/consumer/twitch"
 	"config_con/pkg/pipe/publisher/file"
 	"config_con/pkg/pipe/transformer"
+	transformerConfig "config_con/pkg/config/transformer"
 	"config_con/pkg/pipe/transformer/steps"
 	"config_con/pkg/utils/environment"
 	"context"
@@ -55,7 +56,7 @@ func TestReadConfiguration(t *testing.T) {
 func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 	type fields struct {
 		Consumers    consumer.ConsumerConfig
-		Transformers transformer.TransformerConfig
+		Transformers transformerConfig.TransformerConfig
 		Publishers   publisher.PublisherConfig
 		Pipelines    []pipe.PipeConfig
 	}
@@ -81,8 +82,8 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 						},
 					},
 				},
-				Transformers: transformer.TransformerConfig{
-					Transformers: []transformer.TransformerStepConfig{
+				Transformers: transformerConfig.TransformerConfig{
+					Transformers: []transformerConfig.TransformerStepConfig{
 						{
 							Name: "test_transformer",
 							Steps: []string{
@@ -90,8 +91,8 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 							},
 						},
 					},
-					Steps: transformer.StepConfig{
-						HashMapperSteps: []steps.MapperStep{
+					Steps: transformerConfig.StepConfig{
+						HashMapperSteps: []transformerConfig.MapperStepConfig{
 							{
 								Name: "test_step",
 								MapConfig: map[string]string{
@@ -126,17 +127,11 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 				"test_pipeline": pipe.NewPipe(
 					context.Background(),
 					twitch.NewTwitchEventConsumer("test_consumer", "test_consumer_secret", "test_consumer_url"),
-					transformer.Transformer{
-						Name: "test_transformer",
-						Steps: []transformer.Step{
-							steps.MapperStep{
-								Name: "test_step",
-								MapConfig: map[string]string{
-									"test_key": "test_value",
-								},
-							},
-						},
-					},
+					transformer.NewTransformer("test_transformer", []steps.Step{
+						steps.NewMapperStep("test_step", map[string]string{
+							"test_key": "test_value",
+						}),
+					}),
 					file.NewFilePublisher("test_publisher", "test_path", 0644),
 				),
 			},
@@ -154,8 +149,8 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 						},
 					},
 				},
-				Transformers: transformer.TransformerConfig{
-					Transformers: []transformer.TransformerStepConfig{
+				Transformers: transformerConfig.TransformerConfig{
+					Transformers: []transformerConfig.TransformerStepConfig{
 						{
 							Name: "test_transformer",
 							Steps: []string{
@@ -163,8 +158,8 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 							},
 						},
 					},
-					Steps: transformer.StepConfig{
-						HashMapperSteps: []steps.MapperStep{
+					Steps: transformerConfig.StepConfig{
+						HashMapperSteps: []transformerConfig.MapperStepConfig{
 							{
 								Name: "test_step",
 								MapConfig: map[string]string{

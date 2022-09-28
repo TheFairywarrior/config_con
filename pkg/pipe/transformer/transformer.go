@@ -9,57 +9,6 @@ import (
 	"time"
 )
 
-type Step interface {
-	Process(any) (any, error)
-}
-
-// StepConfig is the holder for the specific step configuration.
-type StepConfig struct {
-	HashMapperSteps []steps.MapperStep `yaml:"hashMapperSteps"`
-}
-
-func (stepConfig StepConfig) GetStepMap() map[string]Step {
-	stepMap := make(map[string]Step)
-	for _, hashMapperStep := range stepConfig.HashMapperSteps {
-		stepMap[hashMapperStep.Name] = hashMapperStep
-	}
-	return stepMap
-}
-
-// TransformerStepConfig holds what steps belong to the transformer.
-type TransformerStepConfig struct {
-	Name  string   `yaml:"name"`
-	Steps []string `yaml:"steps"`
-}
-
-// TransformerConfig holds the configuration for the transformers.
-type TransformerConfig struct {
-	Transformers []TransformerStepConfig `yaml:"transformers"`
-	Steps        StepConfig              `yaml:"steps"`
-}
-
-func (config TransformerConfig) GetTransformerMap() (map[string]Transformer, error) {
-	transformerMap := make(map[string]Transformer)
-	steps := config.Steps.GetStepMap()
-	for _, transformer := range config.Transformers {
-		transformerSteps := []Step{}
-
-		for _, stepName := range transformer.Steps {
-			step, ok := steps[stepName]
-			if !ok {
-				return nil, fmt.Errorf("transformer '%s' had an error: step \"%s\" not found", transformer.Name, stepName)
-			}
-
-			transformerSteps = append(transformerSteps, step)
-		}
-		transformerMap[transformer.Name] = Transformer{
-			Name:  transformer.Name,
-			Steps: transformerSteps,
-		}
-	}
-	return transformerMap, nil
-}
-
 type TransformerMessage struct {
 	queue.MessageData
 	Data any
@@ -69,19 +18,34 @@ func (m TransformerMessage) GetData() (any, error) {
 	return json.Marshal(m.Data)
 }
 
-
 // Transformer is the management point of the transformer.
 type Transformer struct {
-	Name  string
-	Steps []Step
+	name  string
+	seps []steps.Step
 }
+
+func (t Transformer) Name() string {
+	return t.name
+}
+
+func (t Transformer) Steps() []steps.Step {
+	return t.seps
+}
+
+func NewTransformer(name string, steps []steps.Step) Transformer {
+	return Transformer{
+		name:  name,
+		seps: steps,
+	}
+}
+
 
 func (transformer Transformer) runSteps(input queue.Message) (any, error) {
 	output, err := input.GetData()
 	if err != nil {
 		return nil, err
 	}
-	for _, step := range transformer.Steps {
+	for _, step := range transformer.Steps() {
 		output, err = step.Process(output)
 		if err != nil {
 			return nil, err
