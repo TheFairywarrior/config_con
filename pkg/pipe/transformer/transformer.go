@@ -11,17 +11,17 @@ import (
 
 type TransformerMessage struct {
 	queue.MessageData
-	Data any
+	data any
 }
 
 func (m TransformerMessage) GetData() (any, error) {
-	return json.Marshal(m.Data)
+	return json.Marshal(m.data)
 }
 
 // Transformer is the management point of the transformer.
 type Transformer struct {
 	name  string
-	seps []steps.Step
+	steps []steps.Step
 }
 
 func (t Transformer) Name() string {
@@ -29,13 +29,13 @@ func (t Transformer) Name() string {
 }
 
 func (t Transformer) Steps() []steps.Step {
-	return t.seps
+	return t.steps
 }
 
 func NewTransformer(name string, steps []steps.Step) Transformer {
 	return Transformer{
 		name:  name,
-		seps: steps,
+		steps: steps,
 	}
 }
 

@@ -4,15 +4,22 @@ import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/pipe/transformer/steps"
 	"config_con/pkg/utils/test"
+	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type fakeStep struct {
-	name string
+	name     string
+	throwErr bool
 }
 
 func (s fakeStep) Process(data any) (any, error) {
+	if s.throwErr {
+		return nil, fmt.Errorf("error")
+	}
 	return data.(string) + " test", nil
 }
 
@@ -64,4 +71,38 @@ func TestTransformer_RunSteps(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTransformer_transform(t *testing.T) {
+	fakeQueue := queue.NewLocalQueue(1)
+	defer fakeQueue.Close()
+	step := fakeStep{
+		name: "fakeStep",
+	}
+
+	transformer := Transformer{
+		name:  "testTransformer",
+		steps: []steps.Step{step},
+	}
+
+	err := transformer.transform(test.NewFakeMessage("test"), fakeQueue)
+	assert.NoError(t, err)
+
+	data := <-fakeQueue.Chan()
+
+	out, err := data.GetData()
+	assert.NoError(t, err)
+	assert.Equal(t, "\"test test\"", string(out.([]byte)))
+
+	transformer = Transformer{
+		name: "testTransformer",
+		steps: []steps.Step{
+			fakeStep{
+				name:     "fakeStep1",
+				throwErr: true,
+			},
+		},
+	}
+	err = transformer.transform(test.NewFakeMessage("test"), fakeQueue)
+	assert.Error(t, err)
 }

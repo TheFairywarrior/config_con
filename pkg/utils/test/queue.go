@@ -14,7 +14,8 @@ func NewFakeMessage(data any) FakeMessage {
 	}
 }
 
-
 func (m FakeMessage) GetData() (any, error) {
 	return m.fakeData, nil
 }
+
+

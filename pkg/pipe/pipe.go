@@ -18,12 +18,12 @@ type Pipe struct {
 }
 
 func (pipe Pipe) Start() {
-	transformerQueue := queue.NewQueue(1)
-	publisherQueue := queue.NewQueue(1)
+	transformerQueue := queue.NewLocalQueue(1)
+	publisherQueue := queue.NewLocalQueue(1)
 
 	go pipe.consumer.Consume(pipe.cxt, transformerQueue)
 	go pipe.transformer.StartTransformer(pipe.cxt, transformerQueue, publisherQueue)
-	
+
 	publisherRunner := publisher.NewPublisherRunner(pipe.publisher, publisherQueue)
 	go publisherRunner.RunPublisher(pipe.cxt)
 	go func() {

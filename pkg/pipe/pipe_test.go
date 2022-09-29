@@ -22,11 +22,6 @@ func (fC fakeConsumer) Consume(ctx context.Context, queue queue.Queue) error {
 	return nil
 }
 
-type fakeStep struct {
-
-}
-
-
 func TestPipe_Start(t *testing.T) {
 	fP := fakePublisher{}
 	fC := fakeConsumer{}

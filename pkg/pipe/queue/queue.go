@@ -1,6 +1,5 @@
 package queue
 
-
 type Queue interface {
 	Add(data Message) error
 	Chan() <-chan Message
@@ -30,7 +29,7 @@ func (q LocalQueue) Close() {
 	close(q.queue)
 }
 
-func NewQueue(size int) LocalQueue {
+func NewLocalQueue(size int) LocalQueue {
 	return LocalQueue{
 		queue: make(chan Message, size),
 	}

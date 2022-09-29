@@ -66,7 +66,7 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 		url:         "url",
 	}
 
-	tQueue := queue.NewQueue(1)
+	tQueue := queue.NewLocalQueue(1)
 
 	err := consumer.EventRoute(&fakeContext, tQueue)
 	assert.NoError(t, err)
@@ -103,4 +103,22 @@ func TestTwitchEventConsumer_EventRoute(t *testing.T) {
 	err = consumer.EventRoute(&fakeContext, tQueue)
 	assert.NoError(t, err)
 	assert.Equal(t, 402, fakeContext.CurrentStatus)
+}
+
+func TestTwitchEventConsumer_Getters(t *testing.T) {
+	consumer := TwitchEventConsumer{
+		name:        "test",
+		eventSecret: "secret",
+		url:         "url",
+	}
+	assert.Equal(t, "test", consumer.Name())
+	assert.Equal(t, "secret", consumer.EventSecret())
+	assert.Equal(t, "url", consumer.Url())
+}
+
+func TestNewTwitchEventConsumer(t *testing.T) {
+	consumer := NewTwitchEventConsumer("test", "secret", "url")
+	assert.Equal(t, "test", consumer.Name())
+	assert.Equal(t, "secret", consumer.EventSecret())
+	assert.Equal(t, "url", consumer.Url())
 }
