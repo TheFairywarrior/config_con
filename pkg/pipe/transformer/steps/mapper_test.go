@@ -38,7 +38,7 @@ func TestMapperStep_Build(t *testing.T) {
 				Name:      tt.fields.Name,
 				MapConfig: tt.fields.MapConfig,
 			}
-			if got := mapper.Build(); !reflect.DeepEqual(got, tt.want) {
+			if got := mapper.build(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MapperStep.Build() = %v, want %v", got, tt.want)
 			}
 		})
@@ -211,6 +211,43 @@ func TestMapperStep_Process(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MapperStep.Process() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewMapperStep(t *testing.T) {
+	type args struct {
+		name      string
+		mapConfig map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want MapperStep
+	}{
+		{
+			name: "TestNewMapperStep success",
+			args: args{
+				name: "TestNewMapperStep",
+				mapConfig: map[string]string{
+					"hello.there": "general.kenobi",
+					"single":      "single",
+				},
+			},
+			want: MapperStep{
+				Name: "TestNewMapperStep",
+				MapConfig: map[string]string{
+					"hello.there": "general.kenobi",
+					"single":      "single",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewMapperStep(tt.args.name, tt.args.mapConfig); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewMapperStep() = %v, want %v", got, tt.want)
 			}
 		})
 	}

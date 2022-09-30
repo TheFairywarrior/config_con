@@ -7,10 +7,21 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-// MapperStep is used to map a maps field to another one.
+// MapperStep is a struct used to hold the config and logic for mapping one map structure to another.
+// The config takes the shape of a map[string]string.
+//
+// Where the key is the path to the value in the original map.
+// And the value is the path to the value within the new map.
+//
+// Example:
+//
+//	{
+//		"foo.bar": "baz.qux",
+//		"foo.baz": "baz.qux",
+//	}
 type MapperStep struct {
-	Name      string            `yaml:"name"`
-	MapConfig map[string]string `yaml:"mapConfig"`
+	Name      string
+	MapConfig map[string]string
 }
 
 func NewMapperStep(name string, mapConfig map[string]string) MapperStep {
@@ -20,24 +31,27 @@ func NewMapperStep(name string, mapConfig map[string]string) MapperStep {
 	}
 }
 
-func MapConstructor(keys []string) map[string]any {
+// mapConstructor takes a slice of "levels" for the map.
+// Using recursion it creates a new map with the given levels.
+func mapConstructor(keys []string) map[string]any {
 	if len(keys) > 0 {
 		key, keys := keys[0], keys[1:]
 		return map[string]any{
-			key: MapConstructor(keys),
+			key: mapConstructor(keys),
 		}
 	}
 	return nil
 }
 
-// Build creates the "new" map with the new keys.
-func (mapper MapperStep) Build() map[string]any {
+// build takes the MapConfig and usises the "mapConstructor" to build a new map.
+// NOTE: this map has no values.
+func (mapper MapperStep) build() map[string]any {
 	newMapKeys := maps.Values(mapper.MapConfig)
 	newMap := make(map[string]any)
 	for _, keys := range newMapKeys {
 		keyNames := strings.Split(keys, ".")
 		key, keyNames := keyNames[0], keyNames[1:]
-		newMap[key] = MapConstructor(keyNames)
+		newMap[key] = mapConstructor(keyNames)
 	}
 	return newMap
 }
@@ -85,6 +99,6 @@ func (mapper MapperStep) AddData(data map[string]any, newData map[string]any) (m
 // Then it looks over MapConfig and and builds a new map with the new fields.
 // Finally it takes the given data and puts it in the new app.
 func (mapper MapperStep) Process(data any) (any, error) {
-	newMap := mapper.Build()
+	newMap := mapper.build()
 	return mapper.AddData(data.(map[string]any), newMap)
 }

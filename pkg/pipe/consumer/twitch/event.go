@@ -5,16 +5,15 @@ import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/utils/override"
 	"context"
-	"encoding/json"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type TwitchEventConsumer struct {
-	name        string `yaml:"name"`
-	eventSecret string `yaml:"eventSecret"`
-	url         string `yaml:"url"`
+	name        string 
+	eventSecret string 
+	url         string
 }
 
 func (con TwitchEventConsumer) Name() string {
@@ -27,21 +26,6 @@ func (con TwitchEventConsumer) EventSecret() string {
 
 func (con TwitchEventConsumer) Url() string {
 	return con.url
-}
-
-func NewTwitchEventConsumer(name string, eventSecret string, url string) TwitchEventConsumer {
-	return TwitchEventConsumer{
-		name:        name,
-		eventSecret: eventSecret,
-		url:         url,
-	}
-}
-
-func (message TwitchEventMessage) GetData() (any, error) {
-	jsonData, _ := json.Marshal(message.TwitchEventData)
-	var data map[string]any
-	err := json.Unmarshal(jsonData, &data)
-	return data, err
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
@@ -97,4 +81,12 @@ func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error
 	return server.AddRoute("POST", con.Url(), func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)
 	})
+}
+
+func NewTwitchEventConsumer(name string, eventSecret string, url string) TwitchEventConsumer {
+	return TwitchEventConsumer{
+		name:        name,
+		eventSecret: eventSecret,
+		url:         url,
+	}
 }

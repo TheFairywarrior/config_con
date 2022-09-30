@@ -3,6 +3,7 @@ package twitch
 import (
 	"config_con/pkg/pipe/queue"
 	"config_con/pkg/utils/test"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -121,4 +122,51 @@ func TestNewTwitchEventConsumer(t *testing.T) {
 	assert.Equal(t, "test", consumer.Name())
 	assert.Equal(t, "secret", consumer.EventSecret())
 	assert.Equal(t, "url", consumer.Url())
+}
+
+func TestTwitchEventConsumer_Consume(t *testing.T) {
+	q := queue.NewLocalQueue(1)
+	defer q.Close()
+	
+	type fields struct {
+		name        string
+		eventSecret string
+		url         string
+	}
+	type args struct {
+		cxt context.Context
+		q   queue.Queue
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "TestTwitchEventConsumer_Consume",
+			fields: fields{
+				name:        "test",
+				eventSecret: "secret",
+				url:         "url",
+			},
+			args: args{
+				cxt: context.Background(),
+				q:   q,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			con := TwitchEventConsumer{
+				name:        tt.fields.name,
+				eventSecret: tt.fields.eventSecret,
+				url:         tt.fields.url,
+			}
+			if err := con.Consume(tt.args.cxt, tt.args.q); (err != nil) != tt.wantErr {
+				t.Errorf("TwitchEventConsumer.Consume() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

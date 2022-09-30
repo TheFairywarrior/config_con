@@ -6,6 +6,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 )
 
@@ -47,6 +48,13 @@ type TwitchEventData struct {
 type TwitchEventMessage struct {
 	queue.MessageData
 	TwitchEventData
+}
+
+func (message TwitchEventMessage) GetData() (any, error) {
+	jsonData, _ := json.Marshal(message.TwitchEventData)
+	var data map[string]any
+	err := json.Unmarshal(jsonData, &data)
+	return data, err
 }
 
 // getHeaders takes the fiber context in and checks if all of the correct headers are present.

@@ -28,3 +28,8 @@ func TestTransformerQueue_Crud(t *testing.T) {
 	<-queue.Chan()
 	queue.Close()
 }
+
+func TestNewLocalQueue(t *testing.T) {
+	q := NewLocalQueue(1)
+	defer q.Close()
+}

@@ -106,3 +106,34 @@ func TestTransformer_transform(t *testing.T) {
 	err = transformer.transform(test.NewFakeMessage("test"), fakeQueue)
 	assert.Error(t, err)
 }
+
+func TestTransformer_Name(t *testing.T) {
+	type fields struct {
+		name  string
+		steps []steps.Step
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "TestTransformer_Name",
+			fields: fields{
+				name: "testTransformer",
+			},
+			want: "testTransformer",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr := Transformer{
+				name:  tt.fields.name,
+				steps: tt.fields.steps,
+			}
+			if got := tr.Name(); got != tt.want {
+				t.Errorf("Transformer.Name() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -2,11 +2,12 @@ package file
 
 import "os"
 
+
+// FilePublisher is a publisher that writes data to a file.
 type FilePublisher struct {
-	// contains filtered or unexported fields
-	name     string `yaml:"name"`
-	filePath string `yaml:"filePath"`
-	fileMode int    `yaml:"fileMode"`
+	name     string 
+	filePath string 
+	fileMode int    
 }
 
 func (publisher FilePublisher) Name() string {
