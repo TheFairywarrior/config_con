@@ -6,6 +6,9 @@ import (
 	"fmt"
 )
 
+
+// PublisherRunner is the manager for running publisher instances.
+// It holds the queue that will be read from and then passed into the publisher.
 type PublisherRunner struct {
 	publisher Publisher
 	queue     queue.Queue

@@ -13,6 +13,10 @@ type Message interface {
 	Meta() MessageData
 }
 
+
+// MessageData holds the meta data for the message.
+// An instance of this struct is created for each message, and will
+// be passed to all the steps in the pipeline.
 type MessageData struct {
 	id        string
 	timestamp time.Time

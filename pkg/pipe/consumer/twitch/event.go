@@ -29,6 +29,8 @@ func (con TwitchEventConsumer) Url() string {
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
+// It connects the headers, verification, and pushing to queue together while also holding the error handling 
+// for the request.
 func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Queue) error {
 	signature, timestamp, messageId, messageType, err := getHeaders(ctx)
 	if err != nil {
