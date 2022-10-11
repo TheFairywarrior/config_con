@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"config_con/pkg/api"
 	"config_con/pkg/config/consumer/twitch"
 	event "config_con/pkg/pipe/consumer/twitch"
 
@@ -13,6 +14,7 @@ type ConsumerConfig struct {
 
 func (con ConsumerConfig) GetConsumerMap() map[string]consumer.Consumer {
 	consumerMap := make(map[string]consumer.Consumer)
+	api.InitRoutes(len(con.TwitchEventConfigs))
 	for _, twitchEventConfig := range con.TwitchEventConfigs {
 		consumerMap[twitchEventConfig.Name] = event.NewTwitchEventConsumer(
 			twitchEventConfig.Name,

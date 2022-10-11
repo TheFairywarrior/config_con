@@ -5,7 +5,6 @@ import (
 	"config_con/pkg/config"
 	"context"
 	"log"
-	"time"
 
 	"golang.org/x/exp/maps"
 )
@@ -27,8 +26,9 @@ func main() {
 	for _, pipe := range maps.Values(pipes) {
 		pipe.Start()
 	}
-	// A simple fix to stop the server running before the api paths have been added.
-	// TODO: Replace this sleep with a check that all of the consumers are ready.
-	time.Sleep(10 * time.Second) 
+
+	api.WhenReady()
+
+	log.Println("Starting server")
 	server.StartServer(cxt)
 }

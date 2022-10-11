@@ -79,6 +79,7 @@ func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Que
 }
 
 func (con TwitchEventConsumer) Consume(cxt context.Context, q queue.Queue) error {
+	api.ApiRoutes <- con.name // Passing the name of the consumer to know when all the api consumers are ready.
 	server := api.GetServer()
 	return server.AddRoute("POST", con.Url(), func(ctx *fiber.Ctx) error {
 		return con.EventRoute(ctx, q)
