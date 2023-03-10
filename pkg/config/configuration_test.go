@@ -2,7 +2,7 @@ package config
 
 import (
 	"config_con/pkg/config/consumer"
-	twitchConfig "config_con/pkg/config/consumer/twitch"
+	consumerConfig "config_con/pkg/config/consumer"
 	"config_con/pkg/config/publisher"
 	fileConfig "config_con/pkg/config/publisher/file"
 	"config_con/pkg/pipe"
@@ -28,7 +28,7 @@ func TestReadConfiguration(t *testing.T) {
 			name: "ReadConfiguration",
 			want: YamlConfiguration{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
+					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
 							EventSecret: "test_consumer_secret",
@@ -74,7 +74,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			name: "CreatePipelines_Test",
 			fields: fields{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
+					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
 							EventSecret: "test_consumer_secret",
@@ -141,7 +141,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 			name: "CreatePipelines_Test_Invalid_Pipeline",
 			fields: fields{
 				Consumers: consumer.ConsumerConfig{
-					TwitchEventConfigs: []twitchConfig.TwitchEventConfig{
+					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "doesnt_exist",
 							EventSecret: "test_consumer_secret",

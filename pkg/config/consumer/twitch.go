@@ -1,4 +1,4 @@
-package twitch
+package consumer
 
 
 type TwitchEventConfig struct {
