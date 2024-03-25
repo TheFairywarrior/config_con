@@ -1,18 +1,18 @@
 package twitch
 
 import (
-	"config_con/pkg/api"
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/utils/override"
 	"context"
+	"github.com/thefairywarrior/config_con/pkg/api"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/utils/override"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type TwitchEventConsumer struct {
-	name        string 
-	eventSecret string 
+	name        string
+	eventSecret string
 	url         string
 }
 
@@ -29,7 +29,7 @@ func (con TwitchEventConsumer) Url() string {
 }
 
 // EventRoute is the actual function that going to be run when the consumer api is hit.
-// It connects the headers, verification, and pushing to queue together while also holding the error handling 
+// It connects the headers, verification, and pushing to queue together while also holding the error handling
 // for the request.
 func (con TwitchEventConsumer) EventRoute(ctx override.FiberContext, q queue.Queue) error {
 	signature, timestamp, messageId, messageType, err := getHeaders(ctx)

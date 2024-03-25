@@ -1,10 +1,10 @@
 package publisher
 
 import (
-	fileConfig "config_con/pkg/config/publisher/file"
+	fileConfig "github.com/thefairywarrior/config_con/pkg/config/publisher/file"
 
-	"config_con/pkg/pipe/publisher"
-	"config_con/pkg/pipe/publisher/file"
+	"github.com/thefairywarrior/config_con/pkg/pipe/publisher"
+	"github.com/thefairywarrior/config_con/pkg/pipe/publisher/file"
 )
 
 // PublisherConfig is the configuration for the publisher.

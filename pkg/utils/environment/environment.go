@@ -7,7 +7,7 @@ import (
 )
 
 type Environment struct {
-	ConfigFilePath string `env:"CONFIG_CONNECTORCONFIG_FILE_PATH"`
+	ConfigFilePath string `env:"github.com/thefairywarrior/config_conNECTORCONFIG_FILE_PATH"`
 }
 
 var Settings Environment
@@ -19,5 +19,3 @@ func init() {
 		}
 	}
 }
-
-

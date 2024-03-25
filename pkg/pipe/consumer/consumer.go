@@ -1,8 +1,8 @@
 package consumer
 
 import (
-	"config_con/pkg/pipe/queue"
 	"context"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 )
 
 // Consumer interface is used in the pipeline to consume the data from multiple sources.

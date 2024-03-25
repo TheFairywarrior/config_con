@@ -1,11 +1,11 @@
 package transformer
 
 import (
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/pipe/transformer/steps"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
 	"time"
 )
 
@@ -38,7 +38,6 @@ func NewTransformer(name string, steps []steps.Step) Transformer {
 		steps: steps,
 	}
 }
-
 
 func (transformer Transformer) runSteps(input queue.Message) (any, error) {
 	output, err := input.GetData()

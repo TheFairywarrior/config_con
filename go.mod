@@ -1,6 +1,6 @@
-module config_con
+module github.com/thefairywarrior/config_con
 
-go 1.18
+go 1.22
 
 require gopkg.in/yaml.v2 v2.4.0
 

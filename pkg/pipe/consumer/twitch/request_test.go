@@ -1,7 +1,7 @@
 package twitch
 
 import (
-	"config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 	"reflect"
 	"testing"
 )
@@ -35,15 +35,15 @@ func TestTwitchEventMessage_GetData(t *testing.T) {
 			want: map[string]interface{}{
 				"challenge": "",
 				"subscription": map[string]any{
-					"id":         "",
-					"status":     "",
-					"type":       "",
-					"version":    "",
-					"cost":       float64(0),
-					"condition":  map[string]any{
+					"id":      "",
+					"status":  "",
+					"type":    "",
+					"version": "",
+					"cost":    float64(0),
+					"condition": map[string]any{
 						"broadcaster_user_id": "",
 					},
-					"transport":  map[string]any{
+					"transport": map[string]any{
 						"method":   "",
 						"callback": "",
 					},
@@ -60,7 +60,6 @@ func TestTwitchEventMessage_GetData(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

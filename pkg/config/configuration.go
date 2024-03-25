@@ -1,13 +1,13 @@
 package config
 
 import (
-	"config_con/pkg/pipe"
-	"config_con/pkg/config/consumer"
-	"config_con/pkg/config/publisher"
-	"config_con/pkg/config/transformer"
-	"config_con/pkg/utils/environment"
 	"context"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/config/consumer"
+	"github.com/thefairywarrior/config_con/pkg/config/publisher"
+	"github.com/thefairywarrior/config_con/pkg/config/transformer"
+	"github.com/thefairywarrior/config_con/pkg/pipe"
+	"github.com/thefairywarrior/config_con/pkg/utils/environment"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"

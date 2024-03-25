@@ -1,13 +1,13 @@
 package twitch
 
 import (
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/utils/test"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/utils/test"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -127,7 +127,7 @@ func TestNewTwitchEventConsumer(t *testing.T) {
 func TestTwitchEventConsumer_Consume(t *testing.T) {
 	q := queue.NewLocalQueue(1)
 	defer q.Close()
-	
+
 	type fields struct {
 		name        string
 		eventSecret string

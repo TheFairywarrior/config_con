@@ -1,10 +1,10 @@
 package pipe
 
 import (
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/pipe/transformer"
-	"config_con/pkg/pipe/transformer/steps"
 	"context"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
 	"testing"
 )
 

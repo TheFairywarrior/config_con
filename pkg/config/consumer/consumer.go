@@ -1,10 +1,10 @@
 package consumer
 
 import (
-	"config_con/pkg/api"
-	event "config_con/pkg/pipe/consumer/twitch"
+	"github.com/thefairywarrior/config_con/pkg/api"
+	event "github.com/thefairywarrior/config_con/pkg/pipe/consumer/twitch"
 
-	"config_con/pkg/pipe/consumer"
+	"github.com/thefairywarrior/config_con/pkg/pipe/consumer"
 )
 
 type ConsumerConfig struct {

@@ -1,6 +1,6 @@
 package test
 
-import "config_con/pkg/pipe/queue"
+import "github.com/thefairywarrior/config_con/pkg/pipe/queue"
 
 type FakeMessage struct {
 	queue.MessageData
@@ -17,5 +17,3 @@ func NewFakeMessage(data any) FakeMessage {
 func (m FakeMessage) GetData() (any, error) {
 	return m.fakeData, nil
 }
-
-

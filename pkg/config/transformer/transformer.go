@@ -1,9 +1,9 @@
 package transformer
 
 import (
-	"config_con/pkg/pipe/transformer"
-	"config_con/pkg/pipe/transformer/steps"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
 )
 
 // TransformerConfig holds the configuration for the transformers.

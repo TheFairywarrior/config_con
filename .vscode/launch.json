@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/cmd/config_con/main.go",
+            "program": "${workspaceFolder}/cmd/github.com/thefairywarrior/config_con/main.go",
             "cwd": "${workspaceFolder}",
         }
     ]

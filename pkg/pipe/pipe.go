@@ -1,11 +1,11 @@
 package pipe
 
 import (
-	"config_con/pkg/pipe/consumer"
-	"config_con/pkg/pipe/publisher"
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/pipe/transformer"
 	"context"
+	"github.com/thefairywarrior/config_con/pkg/pipe/consumer"
+	"github.com/thefairywarrior/config_con/pkg/pipe/publisher"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer"
 )
 
 // Pipe is an instance of the full data pipeline.

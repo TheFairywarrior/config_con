@@ -1,13 +1,13 @@
 package twitch
 
 import (
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/utils/override"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/utils/override"
 )
 
 type condition struct {

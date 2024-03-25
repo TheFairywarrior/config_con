@@ -1,16 +1,16 @@
 package main
 
 import (
-	"config_con/pkg/api"
-	"config_con/pkg/config"
 	"context"
+	"github.com/thefairywarrior/config_con/pkg/api"
+	"github.com/thefairywarrior/config_con/pkg/config"
 	"log"
 
 	"golang.org/x/exp/maps"
 )
 
 func main() {
-	log.Println("Starting config_con")
+	log.Println("Starting github.com/thefairywarrior/config_con")
 	yamlConfig, err := config.ReadConfiguration()
 	if err != nil {
 		panic(err)

@@ -1,11 +1,10 @@
 package publisher
 
 import (
-	"config_con/pkg/pipe/queue"
 	"context"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 )
-
 
 // PublisherRunner is the manager for running publisher instances.
 // It holds the queue that will be read from and then passed into the publisher.
@@ -13,7 +12,6 @@ type PublisherRunner struct {
 	publisher Publisher
 	queue     queue.Queue
 }
-
 
 func (runner PublisherRunner) runPublisher(message queue.Message) {
 	messageData, err := message.GetData()

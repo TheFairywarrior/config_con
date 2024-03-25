@@ -1,10 +1,10 @@
 package transformer
 
 import (
-	"config_con/pkg/pipe/queue"
-	"config_con/pkg/pipe/transformer/steps"
-	"config_con/pkg/utils/test"
 	"fmt"
+	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
+	"github.com/thefairywarrior/config_con/pkg/utils/test"
 	"reflect"
 	"testing"
 

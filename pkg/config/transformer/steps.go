@@ -1,7 +1,7 @@
 package transformer
 
 import (
-	"config_con/pkg/pipe/transformer/steps"
+	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
 )
 
 // StepConfig is the holder for the specific step configuration.
