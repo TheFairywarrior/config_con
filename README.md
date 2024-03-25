@@ -67,4 +67,5 @@ pipelines:
       consumer: <consumer name>
       transformer: <transformer name>
       publisher: <publisher name>
+      
 ```
