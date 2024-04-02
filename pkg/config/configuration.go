@@ -3,15 +3,17 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/thefairywarrior/config_con/pkg/config/consumer"
 	"github.com/thefairywarrior/config_con/pkg/config/publisher"
 	"github.com/thefairywarrior/config_con/pkg/config/transformer"
 	"github.com/thefairywarrior/config_con/pkg/pipe"
 	"github.com/thefairywarrior/config_con/pkg/utils/environment"
-	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
 )
+
 
 func ReadConfiguration() (YamlConfiguration, error) {
 	configFilePath := environment.Settings.ConfigFilePath
@@ -19,7 +21,7 @@ func ReadConfiguration() (YamlConfiguration, error) {
 		configFilePath = "config.yaml"
 	}
 	var configMap YamlConfiguration
-	yamlFile, err := ioutil.ReadFile(configFilePath)
+	yamlFile, err := os.ReadFile(configFilePath)
 	if err != nil {
 		return YamlConfiguration{}, err
 	}
@@ -38,7 +40,7 @@ type YamlConfiguration struct {
 }
 
 // CreatePipelines builds the pipelines from the configuration.
-func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string]pipe.Pipe, error) {
+func (config YamlConfiguration) CreatePipelines(ctx context.Context) (map[string]pipe.Pipe, error) {
 	consumers := config.Consumers.GetConsumerMap()
 	transformers, err := config.Transformers.GetTransformerMap()
 
@@ -66,7 +68,7 @@ func (config YamlConfiguration) CreatePipelines(cxt context.Context) (map[string
 		}
 
 		pipe := pipe.NewPipe(
-			cxt,
+			ctx,
 			consumer,
 			transformer,
 			publisher,

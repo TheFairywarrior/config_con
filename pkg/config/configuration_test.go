@@ -2,19 +2,20 @@ package config
 
 import (
 	"context"
-	"github.com/thefairywarrior/config_con/pkg/config/consumer"
+	"reflect"
+	"testing"
+
+	"github.com/thefairywarrior/config_con/pkg/pipe/consumer"
 	consumerConfig "github.com/thefairywarrior/config_con/pkg/config/consumer"
 	"github.com/thefairywarrior/config_con/pkg/config/publisher"
 	fileConfig "github.com/thefairywarrior/config_con/pkg/config/publisher/file"
 	transformerConfig "github.com/thefairywarrior/config_con/pkg/config/transformer"
 	"github.com/thefairywarrior/config_con/pkg/pipe"
-	"github.com/thefairywarrior/config_con/pkg/pipe/consumer/twitch"
 	"github.com/thefairywarrior/config_con/pkg/pipe/publisher/file"
 	"github.com/thefairywarrior/config_con/pkg/pipe/transformer"
 	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
+
 	"github.com/thefairywarrior/config_con/pkg/utils/environment"
-	"reflect"
-	"testing"
 )
 
 func TestReadConfiguration(t *testing.T) {
@@ -27,7 +28,7 @@ func TestReadConfiguration(t *testing.T) {
 		{
 			name: "ReadConfiguration",
 			want: YamlConfiguration{
-				Consumers: consumer.ConsumerConfig{
+				Consumers: consumerConfig.ConsumerConfig{
 					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
@@ -55,13 +56,13 @@ func TestReadConfiguration(t *testing.T) {
 
 func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 	type fields struct {
-		Consumers    consumer.ConsumerConfig
+		Consumers    consumerConfig.ConsumerConfig
 		Transformers transformerConfig.TransformerConfig
 		Publishers   publisher.PublisherConfig
 		Pipelines    []pipe.PipeConfig
 	}
 	type args struct {
-		cxt context.Context
+		ctx context.Context
 	}
 	tests := []struct {
 		name    string
@@ -73,7 +74,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 		{
 			name: "CreatePipelines_Test",
 			fields: fields{
-				Consumers: consumer.ConsumerConfig{
+				Consumers: consumerConfig.ConsumerConfig{
 					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "test_consumer",
@@ -121,12 +122,12 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 				},
 			},
 			args: args{
-				cxt: context.Background(),
+				ctx: context.Background(),
 			},
 			want: map[string]pipe.Pipe{
 				"test_pipeline": pipe.NewPipe(
 					context.Background(),
-					twitch.NewTwitchEventConsumer("test_consumer", "test_consumer_secret", "test_consumer_url"),
+					consumer.NewTwitchEventConsumer("test_consumer", "test_consumer_secret", "test_consumer_url"),
 					transformer.NewTransformer("test_transformer", []steps.Step{
 						steps.NewMapperStep("test_step", map[string]string{
 							"test_key": "test_value",
@@ -140,7 +141,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 		{
 			name: "CreatePipelines_Test_Invalid_Pipeline",
 			fields: fields{
-				Consumers: consumer.ConsumerConfig{
+				Consumers: consumerConfig.ConsumerConfig{
 					TwitchEventConfigs: []consumerConfig.TwitchEventConfig{
 						{
 							Name:        "doesnt_exist",
@@ -188,7 +189,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 				},
 			},
 			args: args{
-				cxt: context.Background(),
+				ctx: context.Background(),
 			},
 			want:    map[string]pipe.Pipe{},
 			wantErr: true,
@@ -202,7 +203,7 @@ func TestYamlConfiguration_CreatePipelines(t *testing.T) {
 				Publishers:   tt.fields.Publishers,
 				Pipelines:    tt.fields.Pipelines,
 			}
-			got, err := config.CreatePipelines(tt.args.cxt)
+			got, err := config.CreatePipelines(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("YamlConfiguration.CreatePipelines() error = %v, wantErr %v", err, tt.wantErr)
 			}

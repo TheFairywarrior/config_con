@@ -34,9 +34,14 @@ func (m MessageData) Timestamp() time.Time {
 	return m.timestamp
 }
 
+
 func NewMessageData() MessageData {
+	return NewMessageWithId(uuid.NewString())
+}
+
+func NewMessageWithId(id string) MessageData {
 	return MessageData{
-		id:        uuid.New().String(),
+		id:        id,
 		timestamp: time.Now(),
 	}
 }

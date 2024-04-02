@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+
 	"github.com/thefairywarrior/config_con/pkg/api"
 	"github.com/thefairywarrior/config_con/pkg/config"
-	"log"
 
 	"golang.org/x/exp/maps"
 )
@@ -15,8 +16,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cxt, cancel := context.WithCancel(context.Background())
-	pipes, err := yamlConfig.CreatePipelines(cxt)
+	ctx, cancel := context.WithCancel(context.Background())
+	pipes, err := yamlConfig.CreatePipelines(ctx)
 	if err != nil {
 		cancel()
 		panic(err)
@@ -30,5 +31,5 @@ func main() {
 	api.WhenReady()
 
 	log.Println("Starting server")
-	server.StartServer(cxt)
+	server.StartServer(ctx)
 }

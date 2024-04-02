@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 	"github.com/thefairywarrior/config_con/pkg/pipe/transformer/steps"
-	"time"
 )
 
 type TransformerMessage struct {
@@ -71,11 +72,11 @@ func (transformer Transformer) transform(inMessage queue.Message, outQueue queue
 }
 
 // StartTransformer is the controller for the transformer.
-// It will start the transformer and will listen for messages, as well as waiting for cxt to be done.
-func (transformer Transformer) StartTransformer(cxt context.Context, inQueue queue.Queue, outQueue queue.Queue) {
+// It will start the transformer and will listen for messages, as well as waiting for ctx to be done.
+func (transformer Transformer) StartTransformer(ctx context.Context, inQueue queue.Queue, outQueue queue.Queue) {
 	for {
 		select {
-		case <-cxt.Done():
+		case <-ctx.Done():
 			return
 		case inMessage := <-inQueue.Chan():
 			err := transformer.transform(inMessage, outQueue)

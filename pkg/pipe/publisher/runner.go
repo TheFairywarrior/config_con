@@ -3,6 +3,7 @@ package publisher
 import (
 	"context"
 	"fmt"
+
 	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 )
 
@@ -26,10 +27,10 @@ func (runner PublisherRunner) runPublisher(message queue.Message) {
 
 // RunPublisher is the function that controls the publisher instance.
 // It will run the publisher until the context is done.
-func (runner PublisherRunner) RunPublisher(cxt context.Context) {
+func (runner PublisherRunner) RunPublisher(ctx context.Context) {
 	for {
 		select {
-		case <-cxt.Done():
+		case <-ctx.Done():
 			return
 		case message := <-runner.queue.Chan():
 			runner.runPublisher(message)

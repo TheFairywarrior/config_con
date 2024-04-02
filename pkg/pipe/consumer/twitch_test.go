@@ -1,4 +1,4 @@
-package twitch
+package consumer
 
 import (
 	"context"
@@ -6,9 +6,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"reflect"
+	"testing"
+
 	"github.com/thefairywarrior/config_con/pkg/pipe/queue"
 	"github.com/thefairywarrior/config_con/pkg/utils/test"
-	"testing"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
@@ -134,7 +136,7 @@ func TestTwitchEventConsumer_Consume(t *testing.T) {
 		url         string
 	}
 	type args struct {
-		cxt context.Context
+		ctx context.Context
 		q   queue.Queue
 	}
 	tests := []struct {
@@ -151,7 +153,7 @@ func TestTwitchEventConsumer_Consume(t *testing.T) {
 				url:         "url",
 			},
 			args: args{
-				cxt: context.Background(),
+				ctx: context.Background(),
 				q:   q,
 			},
 			wantErr: false,
@@ -164,8 +166,81 @@ func TestTwitchEventConsumer_Consume(t *testing.T) {
 				eventSecret: tt.fields.eventSecret,
 				url:         tt.fields.url,
 			}
-			if err := con.Consume(tt.args.cxt, tt.args.q); (err != nil) != tt.wantErr {
+			if err := con.Consume(tt.args.ctx, tt.args.q); (err != nil) != tt.wantErr {
 				t.Errorf("TwitchEventConsumer.Consume() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestTwitchEventMessage_GetData(t *testing.T) {
+	type fields struct {
+		MessageData     queue.MessageData
+		TwitchEventData TwitchEventData
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    any
+		wantErr bool
+	}{
+		{
+			name: "TestTwitchEventMessage_GetData",
+			fields: fields{
+				MessageData: queue.NewMessageData(),
+				TwitchEventData: TwitchEventData{
+					Event: event{
+						UserId:               "123",
+						UserLogin:            "test",
+						UserName:             "test",
+						BroadCasterUserId:    "123",
+						BroadCasterUserLogin: "test",
+						BroadCasterUserName:  "test",
+					},
+				},
+			},
+			want: map[string]interface{}{
+				"challenge": "",
+				"subscription": map[string]any{
+					"id":      "",
+					"status":  "",
+					"type":    "",
+					"version": "",
+					"cost":    float64(0),
+					"condition": map[string]any{
+						"broadcaster_user_id": "",
+					},
+					"transport": map[string]any{
+						"method":   "",
+						"callback": "",
+					},
+					"created_at": "",
+				},
+				"event": map[string]interface{}{
+					"broadcaster_user_id":    "123",
+					"broadcaster_user_login": "test",
+					"broadcaster_user_name":  "test",
+					"user_id":                "123",
+					"user_login":             "test",
+					"user_name":              "test",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			message := TwitchEventMessage{
+				MessageData:     tt.fields.MessageData,
+				TwitchEventData: tt.fields.TwitchEventData,
+			}
+			got, err := message.GetData()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TwitchEventMessage.GetData() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TwitchEventMessage.GetData() = %v, want %v", got, tt.want)
 			}
 		})
 	}
