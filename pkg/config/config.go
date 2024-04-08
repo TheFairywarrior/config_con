@@ -1,10 +1,11 @@
 package config
 
+import "github.com/thefairywarrior/config_con/pkg/pipeline/consumer"
+
 type Configuration interface {
 	Load() (any, error)
 	Validate() error
 	Name() string
-	Type() string // Can be consumer, step, publisher or pipeline
 }
 
 type ConfigurationLoader interface {
@@ -17,11 +18,31 @@ type Config struct {
 	publisherConfigs   map[string]Configuration
 }
 
-var configInstances = map[string]Configuration{}
-var configConstructors = map[string]func(map[string]any) Configuration{}
+func (c Config) GetConsumer(name string) (consumer.Consumer, error ) {
+	con, err := c.consumerConfigs[name].Load()
+	if err != nil {
+		return nil, err
+	}
+	return con.(consumer.Consumer), nil
+}
+
+func (c Config) GetTransformer(name string) (any, error) {
+	return nil, nil
+}
+
+func (c Config) GetPublisher(name string) (any, error) {
+	return nil, nil
+}
+
+
+var configConstructors = map[string]func(map[string]any) Configuration{
+	"redis": NewRedisConfig,
+}
+
 var loaderConstructors = map[string]func(map[string]any) ConfigurationLoader{
 	"yaml": NewYamlLoader,
 }
+
 
 func Register(name string, constructor func(map[string]any) Configuration) {
 	configConstructors[name] = constructor

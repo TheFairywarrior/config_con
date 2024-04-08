@@ -34,7 +34,7 @@ func testConfigConstructor(config map[string]any) Configuration {
 }
 
 func TestLoad(t *testing.T) {
-	Register("test", testConfigConstructor)
+	Register("testCon", testConfigConstructor)
 	type args struct {
 		configs map[string]any
 	}
@@ -49,25 +49,25 @@ func TestLoad(t *testing.T) {
 			args: args{
 				configs: map[string]any{
 					"consumer": map[string]any{
-						"test": []map[string]any{
+						"testCon": []map[string]any{
 							{
-								"name":      "test",
+								"name":      "test1",
 								"something": "something",
 							},
 						},
 					},
 					"transformer": map[string]any{
-						"test": []map[string]any{
+						"testCon": []map[string]any{
 							{
-								"name":      "test",
+								"name":      "test2",
 								"something": "something",
 							},
 						},
 					},
 					"publisher": map[string]any{
-						"test": []map[string]any{
+						"testCon": []map[string]any{
 							{
-								"name":      "test",
+								"name":      "test3",
 								"something": "something",
 							},
 						},
@@ -76,20 +76,20 @@ func TestLoad(t *testing.T) {
 			},
 			want: Config{
 				consumerConfigs: map[string]Configuration{
-					"test": &testConfig{
-						name:      "test",
+					"test1": &testConfig{
+						name:      "test1",
 						something: "something",
 					},
 				},
 				transformerConfigs: map[string]Configuration{
-					"test": &testConfig{
-						name:      "test",
+					"test2": &testConfig{
+						name:      "test2",
 						something: "something",
 					},
 				},
 				publisherConfigs: map[string]Configuration{
-					"test": &testConfig{
-						name:      "test",
+					"test3": &testConfig{
+						name:      "test3",
 						something: "something",
 					},
 				},
