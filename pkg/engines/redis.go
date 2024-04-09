@@ -1,4 +1,4 @@
-package consumer
+package engines
 
 import (
 	"context"
@@ -9,12 +9,7 @@ import (
 	"github.com/thefairywarrior/config_con/pkg/pipeline"
 )
 
-type RedisMessageData struct {
-	ID   string         `json:id`
-	Data map[string]any `json:data`
-}
-
-type RedisConsumer struct {
+type RedisEngine struct {
 	host     string
 	port     int
 	database int
@@ -22,7 +17,9 @@ type RedisConsumer struct {
 	passwrod string
 }
 
-func (r *RedisConsumer) Consume(ctx context.Context, c chan pipeline.Message) error {
+
+
+func (r *RedisEngine) Consume(ctx context.Context, c chan pipeline.Message) error {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", r.host, r.port),
 		Password: r.passwrod,
@@ -44,7 +41,7 @@ func (r *RedisConsumer) Consume(ctx context.Context, c chan pipeline.Message) er
 		case <-ctx.Done():
 			return nil;
 		case msg := <-ch:
-			result := RedisMessageData{}
+			result := make(map[string]any)
 			err := json.Unmarshal([]byte(msg.Payload), &result)
 			if err != nil {
 				return err
@@ -55,8 +52,8 @@ func (r *RedisConsumer) Consume(ctx context.Context, c chan pipeline.Message) er
 	return nil
 }
 
-func NewRedisConsumer(host string, port, database int, channel, password string) *RedisConsumer {
-	return &RedisConsumer{
+func NewRedisEngine(host string, port, database int, channel, password string) RedisEngine {
+	return RedisEngine{
 		host:     host,
 		port:     port,
 		database: database,

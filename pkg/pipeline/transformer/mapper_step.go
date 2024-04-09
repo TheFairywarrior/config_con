@@ -1,6 +1,5 @@
 package transformer
 
-
 import (
 	"fmt"
 	"strings"
@@ -21,14 +20,12 @@ import (
 //		"foo.baz": "baz.qux",
 //	}
 type MapperStep struct {
-	Name      string
-	MapConfig map[string]string
+	mapConfig map[string]string
 }
 
-func NewMapperStep(name string, mapConfig map[string]string) MapperStep {
+func NewMapperStep(mapConfig map[string]string) MapperStep {
 	return MapperStep{
-		Name:      name,
-		MapConfig: mapConfig,
+		mapConfig: mapConfig,
 	}
 }
 
@@ -47,7 +44,7 @@ func mapConstructor(keys []string) map[string]any {
 // build takes the MapConfig and usises the "mapConstructor" to build a new map.
 // NOTE: this map has no values.
 func (mapper MapperStep) build() map[string]any {
-	newMapKeys := maps.Values(mapper.MapConfig)
+	newMapKeys := maps.Values(mapper.mapConfig)
 	newMap := make(map[string]any)
 	for _, keys := range newMapKeys {
 		keyNames := strings.Split(keys, ".")
@@ -82,7 +79,7 @@ func setMapValue(data map[string]any, keys []string, value any) {
 
 // AddData takes the newly made map and adds the data to it.
 func (mapper MapperStep) AddData(data map[string]any, newData map[string]any) (map[string]any, error) {
-	for dataKeys, newKeys := range mapper.MapConfig {
+	for dataKeys, newKeys := range mapper.mapConfig {
 		keyNames := strings.Split(dataKeys, ".")
 		valueNames := strings.Split(newKeys, ".")
 		value, err := getMapValue(data, keyNames)

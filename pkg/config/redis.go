@@ -1,16 +1,14 @@
 package config
 
+import "github.com/thefairywarrior/config_con/pkg/engines"
+
 type RedisConfig struct {
-	name     string
-	host     string
-	port     int
-	database int
-	channel  string
-	password string
+	name string
+	engines.RedisEngine
 }
 
 func (c *RedisConfig) Load() (any, error) {
-	return nil, nil
+	return c.RedisEngine, nil
 }
 
 func (c *RedisConfig) Validate() error {
@@ -23,11 +21,7 @@ func (c *RedisConfig) Name() string {
 
 func NewRedisConfig(data map[string]any) Configuration {
 	return &RedisConfig{
-		name:     data["name"].(string),
-		host:     data["host"].(string),
-		port:     data["port"].(int),
-		database: data["database"].(int),
-		channel:  data["channel"].(string),
-		password: data["password"].(string),
+		name:        data["name"].(string),
+		RedisEngine: engines.NewRedisEngine(data["host"].(string), data["port"].(int), data["database"].(int), data["channel"].(string), data["password"].(string)),
 	}
 }

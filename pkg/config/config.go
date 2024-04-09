@@ -37,6 +37,7 @@ func (c Config) GetPublisher(name string) (any, error) {
 
 var configConstructors = map[string]func(map[string]any) Configuration{
 	"redis": NewRedisConfig,
+	"clickhouse": NewClickhouseConfig,
 }
 
 var loaderConstructors = map[string]func(map[string]any) ConfigurationLoader{
