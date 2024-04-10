@@ -77,3 +77,4 @@ func Load(configs map[string]any) (Config, error) {
 	}
 	return config, nil
 }
+
